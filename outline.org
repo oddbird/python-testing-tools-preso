@@ -1,0 +1,96 @@
+- who is currently writing Python tests?
+- what tools: unittest? nose? py.test? others?
+
+- goal: introduce you to useful Python testing tools
+  - highlights; breadth over depth; follow up on what looks useful to you
+
+* py.test
+** writing tests
+   - just write a function named test_* in a module test_*.py!
+     - (naming conventions customizable)
+   - use regular Python asserts
+** running tests
+   - run "py.test"
+   - can give it a directory name or a file name
+   - can use -k keyword
+** fixtures
+   - allow tests to request access to resources with setup/teardown
+   - example: built-in tempdir fixture
+     - it's built in, but let's write it ourselves
+     - compare to versions written with repetition or with setUp()
+   - fixtures can have different lifecycle scopes: function, class, module, session
+     - explain implication of these scopes using tempdir as example
+   - example: redis
+     - note: fixture is lazy, so if you run a module full of tests that don't
+       need Redis, it will never be set up
+   - docs: http://bit.ly/pytest-fixtures
+** parametrized tests
+   - allows testing many similar cases without repetition
+   - example: testing a "from_roman()" function
+   - docs: http://bit.ly/pytest-params
+** parametrized fixtures
+   - example: testing against several different databases
+   - docs: http://bit.ly/pytest-fixture-params
+** test marking
+   - "tag" tests so as to select a subset to run
+   - example: marking slow tests
+     - mark tests (or test classes) using @pytest.mark.slow
+     - run just the slow tests with -m slow
+     - run just the fast tests with -m "not slow"
+   - example: pytest-poo! http://bit.ly/pytest-poo
+** test skipping and xfailing
+   - @pytest.mark.skipif(condition, reason=reason)
+   - example: skip tests on older Python versions
+   - use py.test -rs to report on all skips and the reasons for them
+   - similarly, @pytest.mark.xfail; -rx to report; --runxfail to run as if not xfailed
+   - docs: http://bit.ly/skipif
+** alternatives to py.test
+
+* WebTest
+  - server-side testing of web applications
+    - test full request/response cycles, but not client
+      - not browser automation, won't test your JavaScript
+      - tests run a lot faster than browser-automation
+        - Selenium has a great Python lib for browser-automation tests
+  - example: testing a form submission and HTML in response
+  - example: testing a JSON Ajax response
+  - docs: http://bit.ly/python-webtest
+
+* tox
+  - easily run your tests across a matrix of environments
+    - different Python versions
+    - different dependency versions
+    - different configurations
+  - toy example: test on Python 2.7 and 3.3, with Django 1.5 and 1.6 - four envs
+  - complex example: many Python versions, Django versions, and databases
+  - docs: http://bit.ly/py-tox
+
+* mock & pretend
+  - sometimes your code has to interact with other code or other systems
+    - sometimes those systems are slow, complicated, and/or unreliable
+    - maybe it talks to the network
+    - maybe it talks to a database
+  - how do we test this code? (and avoid spurious failures, slowness, and setup difficulty)
+    - a) isolate - write as much of your code as possible ignorant of the other system
+      - example: analyzing data from the Twitter API
+        - write all your analysis code to operate on simple data structures - easy to test
+        - write as thin a layer as possible to actually get the data from Twitter
+    - but at some point you have to write at least one or two tests of the hard-to-test code, so
+    - b) use fake objects in place of the complicated ones.
+  - pretend and mock are libraries that help you easily create test fakes.
+  - example: email a user; need user's name and email, don't want to create a real user - stub!
+  - but what about testing the email side? don't want to send a real email in test.
+    - function accepts an EmailServer instance with a send() method
+    - in test, send in a stub EmailServer!
+      - unsatisfying - no verification that we're actually calling email_server.send()
+        - try a spy instead, using mock.Mock()
+        - email_server.assert_called_once_with()
+  - monkeypatching - sometimes useful, but dependency injection is better
+
+* coverage
+  - which lines of my code are not executed when I run my test suite?
+    - (or, which branches of my code are not taken; not necessarily the same thing)
+  - pip install coverage
+  - coverage run --branch `which py.test`
+  - coverage html
+  - docs: http://bit.ly/coveragepy
