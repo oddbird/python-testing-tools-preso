@@ -8,7 +8,29 @@
   <li><a href="https://twitter.com/carljm" rel="me">@carljm</a></li>
 </ul>
 </div></p></div><div class="step" step="1" id="thistalk" data-reveal="1" data-x="1600" data-y="0"><h1 id="this-talk">This talk</h1><ul><li>py.test</li><li>fixtures</li><li>parametrized tests</li><li>test marking &amp; skipping</li><li>WebTest</li><li>tox</li><li>mock &amp; pretend</li><li>coverage</li></ul></div><div class="step" step="2" data-reveal="1" data-x="3200" data-y="0"><h1 id="how">How</h1><ul><li>Introduce a feature</li><li>Example(s)</li><li>Just a taste!</li><li>Link to docs</li><li>Python 3</li></ul><div class="notes"><p>Docs links on final slide. No stress; doc links will be live in online
-slides.</p><p>All code is Py3, but will note Py2 differences.</p></div></div><div class="step" step="3" data-reveal="1" data-x="4800" data-y="0"><h1 id="me">Me</h1><ul><li>Writing Python since 2002.</li><li>Professionally since 2007.</li><li>Mostly web development.</li><li>OSS: pip, virtualenv, Django</li></ul></div><div class="step" step="4" id="questions" data-x="6400" data-y="0"><h1 id="questions">Questions?</h1><ul><li><a href="http://oddbird.net/python-testing-tools-preso">oddbird.net/python-testing-tools-preso</a></li></ul><p><div class="vcard">
+slides.</p><p>All code is Py3, but will note Py2 differences.</p></div></div><div class="step" step="3" data-reveal="1" data-x="4800" data-y="0"><h1 id="me">Me</h1><ul><li>Writing Python since 2002.</li><li>Professionally since 2007.</li><li>Mostly web development.</li><li>OSS: pip, virtualenv, Django</li></ul></div><div class="step" step="4" data-x="6400" data-y="0"><h1 id="py-test">py.test</h1><h2 id="grades-py">grades.py</h2><pre class="highlight code python"><span class="k">def</span> <span class="nf">get_level</span><span class="p">(</span><span class="n">min_grade</span><span class="p">,</span> <span class="n">max_grade</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">max_grade</span> <span class="o">&lt;=</span> <span class="mi">6</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s">'elementary'</span>
+    <span class="k">if</span> <span class="n">min_grade</span> <span class="o">&gt;</span> <span class="mi">6</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s">'secondary'</span>
+    <span class="k">return</span> <span class="bp">None</span></pre><h2 id="test-grades-py">test_grades.py</h2><pre class="highlight code python"><span class="kn">import</span> <span class="nn">grades</span>
+
+<span class="k">def</span> <span class="nf">test_get_level</span><span class="p">():</span>
+    <span class="k">assert</span> <span class="n">grades</span><span class="o">.</span><span class="n">get_level</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span> <span class="o">==</span> <span class="s">'elementary'</span></pre><div class="notes"><p>py.test will find and run tests in any file whose name begins with
+"test_". Test functions also need to have names beginning with "test_".</p><p>Matching up "grades.py" with "test_grades.py" is not necessary, though often
+helpful to keep tests organized.</p><p>(These naming conventions are customizable.)</p></div></div><div class="step" step="5" data-x="8000" data-y="0"><pre class="highlight ">$ pip install pytest</pre><pre class="highlight ">$ py.test
+============== test session starts ========================
+platform linux -- Python 3.3.2 -- py-1.4.20 -- pytest-2.5.2
+collected 1 items
+
+test_grades.py .
+
+============== 1 passed in 0.01 seconds ===================</pre><div class="notes"><p>To run the tests, just "pip install pytest" and run "py.test" - it will
+automatically find and run your tests. Here it runs our one test, which
+passes!</p></div></div><div class="step" step="6" data-reveal="1" data-x="9600" data-y="0"><h1 id="python-test-runners">Python test runners</h1><h2 id="a-brief-synopsis-and-digression">A brief synopsis and digression</h2><ul><li>We saw <a href="http://pytest.org">py.test</a> in action: <tt>pip install pytest; py.test</tt></li><li><a href="https://nose.readthedocs.org/">Nose</a> is similar: <tt>pip install nose; nosetests</tt></li><li>Both can run simple function tests with asserts.</li><li><a href="http://docs.python.org/3.3/library/unittest.html">unittest</a> is in the standard library, similar to "xUnit" test frameworks in
+various languages. Tests require a bit more boilerplate. <tt>python -m unittest
+discover</tt></li><li>Others: <a href="http://twistedmatrix.com/trac/wiki/TwistedTrial">twisted.trial</a>, <a href="https://pypi.python.org/pypi/zope.testrunner">zope.testrunner</a></li></ul><div class="notes"><p>If all these choices are overwhelming, don't worry about it. They're all
+fine, just pick one and run with it.</p><p>My choice is py.test, so that's what I'll be covering today.</p></div></div><div class="step" step="7" data-reveal="1" data-x="11200" data-y="0"><h1 id="choosing-tests-to-run">Choosing tests to run</h1><ul><li>Name a test file: <tt>py.test path/to/test_grades.py</tt></li><li>Name a directory: <tt>py.test some/tests/</tt></li><li>Match a keyword in test function name: <tt>py.test -k grades</tt></li></ul></div><div class="step" step="8" id="questions" data-x="12800" data-y="0"><h1 id="questions">Questions?</h1><ul><li><a href="http://oddbird.net/python-testing-tools-preso">oddbird.net/python-testing-tools-preso</a></li></ul><p><div class="vcard">
 <a href="http://www.oddbird.net">
   <img src="images/logo.svg" alt="OddBird" class="logo" />
 </a>
