@@ -7,7 +7,7 @@
   <li><a href="http://www.oddbird.net" class="org url">oddbird.net</a></li>
   <li><a href="https://twitter.com/carljm" rel="me">@carljm</a></li>
 </ul>
-</div></p></div><div class="step" step="1" id="thistalk" data-reveal="1" data-x="1600" data-y="0"><h1 id="this-talk">This talk</h1><ul><li>py.test</li><li>fixtures</li><li>parametrized tests</li><li>test marking &amp; skipping</li><li>WebTest</li><li>tox</li><li>mock &amp; pretend</li><li>coverage</li></ul></div><div class="step" step="2" data-reveal="1" data-x="3200" data-y="0"><h1 id="how">How</h1><ul><li>Introduce a feature</li><li>Example(s)</li><li>Just a taste!</li><li>Link to docs</li><li>Python 3</li></ul><div class="notes"><p>Docs links on final slide. No stress; doc links will be live in online
+</div></p></div><div class="step" step="1" id="thistalk" data-reveal="1" data-x="1600" data-y="0"><h1 id="this-talk">This talk</h1><ul><li>py.test</li><li>test marking &amp; skipping</li><li>fixtures</li><li>parametrized tests</li><li>WebTest</li><li>tox</li><li>mock &amp; pretend</li><li>coverage</li></ul></div><div class="step" step="2" data-reveal="1" data-x="3200" data-y="0"><h1 id="how">How</h1><ul><li>Introduce a feature</li><li>Example(s)</li><li>Just a taste!</li><li>Link to docs</li><li>Python 3</li></ul><div class="notes"><p>Docs links on final slide. No stress; doc links will be live in online
 slides.</p><p>All code is Py3, but will note Py2 differences.</p></div></div><div class="step" step="3" data-reveal="1" data-x="4800" data-y="0"><h1 id="me">Me</h1><ul><li>Writing Python since 2002.</li><li>Professionally since 2007.</li><li>Mostly web development.</li><li>OSS: pip, virtualenv, Django</li></ul></div><div class="step" step="4" data-x="6400" data-y="0"><h1 id="py-test">py.test</h1><h2 id="grades-py">grades.py</h2><pre class="highlight code python"><span class="k">def</span> <span class="nf">get_level</span><span class="p">(</span><span class="n">min_grade</span><span class="p">,</span> <span class="n">max_grade</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">max_grade</span> <span class="o">&lt;=</span> <span class="mi">6</span><span class="p">:</span>
         <span class="k">return</span> <span class="s">'elementary'</span>
@@ -17,20 +17,79 @@ slides.</p><p>All code is Py3, but will note Py2 differences.</p></div></div><di
 
 <span class="k">def</span> <span class="nf">test_get_level</span><span class="p">():</span>
     <span class="k">assert</span> <span class="n">grades</span><span class="o">.</span><span class="n">get_level</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span> <span class="o">==</span> <span class="s">'elementary'</span></pre><div class="notes"><p>py.test will find and run tests in any file whose name begins with
-"test_". Test functions also need to have names beginning with "test_".</p><p>Matching up "grades.py" with "test_grades.py" is not necessary, though often
-helpful to keep tests organized.</p><p>(These naming conventions are customizable.)</p></div></div><div class="step" step="5" data-x="8000" data-y="0"><pre class="highlight ">$ pip install pytest</pre><pre class="highlight ">$ py.test
-============== test session starts ========================
-platform linux -- Python 3.3.2 -- py-1.4.20 -- pytest-2.5.2
-collected 1 items
-
-test_grades.py .
-
-============== 1 passed in 0.01 seconds ===================</pre><div class="notes"><p>To run the tests, just "pip install pytest" and run "py.test" - it will
+"test_". Test functions also need to have names beginning with "test".</p><p>Matching up "grades.py" with "test_grades.py" is not necessary, though often
+helpful to keep tests organized.</p><p>(These naming conventions are customizable.)</p></div></div><div class="step" step="5" data-emphasize-lines-step="1,2,4,5,7,9" data-x="8000" data-y="0"><pre class="highlight code"><span class="ln">1 </span>$ pip install pytest</pre><pre class="highlight code"><span class="ln">1 </span>$ py.test
+<span class="ln">2 </span>============== test session starts ========================
+<span class="ln">3 </span>platform linux -- Python 3.3.2 -- py-1.4.20 -- pytest-2.5.2
+<span class="ln">4 </span>collected 1 items
+<span class="ln">5 </span>
+<span class="ln">6 </span>test_grades.py .
+<span class="ln">7 </span>
+<span class="ln">8 </span>============== 1 passed in 0.01 seconds ===================</pre><div class="notes"><p>To run the tests, just "pip install pytest" and run "py.test" - it will
 automatically find and run your tests. Here it runs our one test, which
 passes!</p></div></div><div class="step" step="6" data-reveal="1" data-x="9600" data-y="0"><h1 id="python-test-runners">Python test runners</h1><h2 id="a-brief-synopsis-and-digression">A brief synopsis and digression</h2><ul><li>We saw <a href="http://pytest.org">py.test</a> in action: <tt>pip install pytest; py.test</tt></li><li><a href="https://nose.readthedocs.org/">Nose</a> is similar: <tt>pip install nose; nosetests</tt></li><li>Both can run simple function tests with asserts.</li><li><a href="http://docs.python.org/3.3/library/unittest.html">unittest</a> is in the standard library, similar to "xUnit" test frameworks in
 various languages. Tests require a bit more boilerplate. <tt>python -m unittest
 discover</tt></li><li>Others: <a href="http://twistedmatrix.com/trac/wiki/TwistedTrial">twisted.trial</a>, <a href="https://pypi.python.org/pypi/zope.testrunner">zope.testrunner</a></li></ul><div class="notes"><p>If all these choices are overwhelming, don't worry about it. They're all
-fine, just pick one and run with it.</p><p>My choice is py.test, so that's what I'll be covering today.</p></div></div><div class="step" step="7" data-reveal="1" data-x="11200" data-y="0"><h1 id="choosing-tests-to-run">Choosing tests to run</h1><ul><li>Name a test file: <tt>py.test path/to/test_grades.py</tt></li><li>Name a directory: <tt>py.test some/tests/</tt></li><li>Match a keyword in test function name: <tt>py.test -k grades</tt></li></ul></div><div class="step" step="8" id="questions" data-x="12800" data-y="0"><h1 id="questions">Questions?</h1><ul><li><a href="http://oddbird.net/python-testing-tools-preso">oddbird.net/python-testing-tools-preso</a></li></ul><p><div class="vcard">
+fine, just pick one and run with it.</p><p>My choice is py.test, so that's what I'll be covering today.</p></div></div><div class="step" step="7" data-reveal="1" data-x="11200" data-y="0"><h1 id="choosing-tests-to-run">Choosing tests to run</h1><ul><li>Name a test file: <tt>py.test path/to/test_grades.py</tt></li><li>Name a directory: <tt>py.test some/tests/</tt></li><li>Match test function/class name: <tt>py.test -k grades</tt></li><li>Select tests by "mark": <tt>py.test -m "not slow"</tt></li></ul><div class="notes"><p>Flexible matching of tests to run - very important for fast edit/test
+cycles, especially in larger projects.</p><p>Select by mark - which raises the question...</p></div></div><div class="step" step="8" data-emphasize-lines-step="3" data-reveal="1" data-x="12800" data-y="0"><h1 id="wait-what-s-a-mark">Wait, what's a "mark"?</h1><pre class="highlight code python"><span class="ln">1 </span><span class="kn">import</span> <span class="nn">pytest</span>
+<span class="ln">2 </span>
+<span class="ln">3 </span><span class="nd">@pytest.mark.slow</span>
+<span class="ln">4 </span><span class="k">def</span> <span class="nf">test_something_very_slow</span><span class="p">():</span>
+<span class="ln">5 </span>    <span class="sd">"""Can download the internet."""</span>
+<span class="ln">6 </span>    <span class="c"># ...</span></pre><ul><li><tt>py.test -m slow</tt> will run only tests with this mark.</li><li><tt>py.test -m "not slow"</tt> will run only tests without it.</li><li>Can also use <tt>and</tt> / <tt>or</tt> for conditions with multiple marks.</li></ul><div class="notes"><p>You can use any mark names you want (valid Python identifiers) or configure
+a restricted set for the project in your <tt>pytest.ini</tt> file.</p></div></div><div class="step" step="9" data-emphasize-lines-step="2,3,4,5,6,7,8,9" data-x="14400" data-y="0"><h1 id="pytest-ini">pytest.ini</h1><pre class="highlight code ini"><span class="ln"> 1 </span><span class="k">[pytest]</span>
+<span class="ln"> 2 </span><span class="na">minversion</span> <span class="o">=</span> <span class="s">2.4.2</span>
+<span class="ln"> 3 </span><span class="na">addopts</span> <span class="o">=</span> <span class="s">--strict --cov-report html --cov myproj</span>
+<span class="ln"> 4 </span><span class="na">norecursedirs</span> <span class="o">=</span> <span class="s">.* _* selenium node_modules qunit</span>
+<span class="ln"> 5 </span><span class="na">python_files</span> <span class="o">=</span> <span class="s">test_*.py</span>
+<span class="ln"> 6 </span><span class="na">python_classes</span> <span class="o">=</span> <span class="s">Test</span>
+<span class="ln"> 7 </span><span class="na">python_functions</span> <span class="o">=</span> <span class="s">test</span>
+<span class="ln"> 8 </span><span class="na">markers</span> <span class="o">=</span><span class="s">
+</span><span class="ln"> 9 </span><span class="s">    slow: mark a test as slow
+</span><span class="ln">10 </span><span class="s">    web: mark a test as a web test</span></pre><div class="notes"><p>All optional.</p><p>If you use markers, recommended to list valid markers so there's one
+reference point for all markers used, and typos become errors (with
+<tt>strict</tt>). At some point in the future pytest may require markers to be
+registered.</p></div></div><div class="step" step="10" data-reveal="1" data-x="16000" data-y="0"><h1 id="classes">Classes?</h1><pre class="highlight code python"><span class="k">class</span> <span class="nc">TestPager</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">test_num_pages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">"""Can calculate total number of pages."""</span>
+        <span class="k">assert</span> <span class="n">pager</span><span class="p">(</span><span class="n">count</span><span class="o">=</span><span class="mi">23</span><span class="p">,</span> <span class="n">pagesize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">num_pages</span> <span class="o">==</span> <span class="mi">3</span>
+
+    <span class="k">def</span> <span class="nf">test_item_range</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">"""Can calculate range of items to be shown."""</span>
+        <span class="c"># ...</span></pre><ul><li>Can use classes to group related tests, but not required.</li><li>Unlike <tt>unittest</tt>, no special <tt>TestCase</tt> class to inherit from.</li><li>Avoid using classes for setup/teardown (use fixtures).</li><li>Avoid using classes to parametrize tests (use parametrized tests).</li></ul></div><div class="step" step="11" data-emphasize-lines-step="4,5" data-x="17600" data-y="0"><h1 id="test-skipping">Test skipping</h1><h2 id="not-all-tests-can-run-in-all-environments">Not all tests can run in all environments.</h2><pre class="highlight code python"><span class="ln">1 </span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="ln">2 </span><span class="kn">import</span> <span class="nn">pytest</span>
+<span class="ln">3 </span>
+<span class="ln">4 </span><span class="nd">@pytest.mark.skipif</span><span class="p">(</span>
+<span class="ln">5 </span>    <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">!=</span> <span class="s">'win32'</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="s">'Windows specific'</span><span class="p">)</span>
+<span class="ln">6 </span><span class="k">def</span> <span class="nf">test_updates_registry</span><span class="p">():</span>
+<span class="ln">7 </span>    <span class="sd">"""Checks and updates registry entries."""</span>
+<span class="ln">8 </span>    <span class="c"># ...</span></pre><div class="notes"><p>Can mark any test to be skipped under some conditions.</p></div></div><div class="step" step="12" data-emphasize-lines-step="6,9,16" data-x="19200" data-y="0"><pre class="highlight code"><span class="ln">1 </span>$ py.test
+<span class="ln">2 </span>================ test session starts ======================
+<span class="ln">3 </span>platform linux -- Python 3.3.2 -- py-1.4.20 -- pytest-2.5.2
+<span class="ln">4 </span>collected 4 items
+<span class="ln">5 </span>
+<span class="ln">6 </span>test_grades.py ...s
+<span class="ln">7 </span>
+<span class="ln">8 </span>================ 3 passed, 1 skipped in 0.02 seconds ======</pre><pre class="highlight code"><span class="ln"> 1 </span>$ py.test -rs
+<span class="ln"> 2 </span>================ test session starts ======================
+<span class="ln"> 3 </span>platform linux -- Python 3.3.2 -- py-1.4.20 -- pytest-2.5.2
+<span class="ln"> 4 </span>collected 4 items
+<span class="ln"> 5 </span>
+<span class="ln"> 6 </span>test_grades.py ...s
+<span class="ln"> 7 </span>================ short test summary info ==================
+<span class="ln"> 8 </span>SKIP [1] /.../_pytest/skipping.py:132: Windows specific
+<span class="ln"> 9 </span>
+<span class="ln">10 </span>================ 3 passed, 1 skipped in 0.02 seconds ======</pre><div class="notes"><p>Skipped tests show up as an 's' instead of a '.'.</p><p>Run py.test with '-rs' to show reasons for skipped tests.</p></div></div><div class="step" step="13" data-emphasize-lines-step="4,5" data-reveal="1" data-x="20800" data-y="0"><h1 id="expected-failures">Expected failures</h1><h2 id="sometimes-we-expect-a-test-to-fail-for-now">Sometimes we expect a test to fail, for now.</h2><pre class="highlight code python"><span class="ln">1 </span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="ln">2 </span><span class="kn">import</span> <span class="nn">pytest</span>
+<span class="ln">3 </span>
+<span class="ln">4 </span><span class="nd">@pytest.mark.xfail</span><span class="p">(</span>
+<span class="ln">5 </span>    <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">reason</span><span class="o">=</span><span class="s">"Buggy on Py 3.4"</span><span class="p">)</span>
+<span class="ln">6 </span><span class="k">def</span> <span class="nf">test_something_that_doesnt_work_yet_on_python_34</span><span class="p">():</span>
+<span class="ln">7 </span>    <span class="k">pass</span> <span class="c"># ...</span></pre><ul><li>Just like <tt>-rs</tt> for skips, <tt>-rx</tt> will provide additional info on expected
+failures.</li><li><tt>xfail</tt> tests will report an <tt>X</tt> (<tt>xpass</tt> or "unexpected pass") if they
+pass.</li><li>Use <tt>--runxfail</tt> to run <tt>xfail</tt> tests normally (report failures as
+failures).</li></ul><div class="notes"><p>May be a low priority bug that we plan to fix, or a feature we haven't fully
+implemented yet.</p><p>Can also unconditionally xfail, provide only a reason.</p></div></div><div class="step" step="14" id="questions" data-x="22400" data-y="0"><h1 id="questions">Questions?</h1><ul><li><a href="http://oddbird.net/python-testing-tools-preso">oddbird.net/python-testing-tools-preso</a></li><li><a href="http://pytest.org">pytest.org</a></li></ul><p><div class="vcard">
 <a href="http://www.oddbird.net">
   <img src="images/logo.svg" alt="OddBird" class="logo" />
 </a>

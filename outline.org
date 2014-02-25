@@ -13,6 +13,20 @@
    - run "py.test"
    - can give it a directory name or a file name
    - can use -k keyword
+** alternatives to py.test
+** test marking
+   - "tag" tests so as to select a subset to run
+   - example: marking slow tests
+     - mark tests (or test classes) using @pytest.mark.slow
+     - run just the slow tests with -m slow
+     - run just the fast tests with -m "not slow"
+   - example: pytest-poo! http://bit.ly/pytest-poo
+** test skipping and xfailing
+   - @pytest.mark.skipif(condition, reason=reason)
+   - example: skip tests on older Python versions
+   - use py.test -rs to report on all skips and the reasons for them
+   - similarly, @pytest.mark.xfail; -rx to report; --runxfail to run as if not xfailed
+   - docs: http://bit.ly/skipif
 ** fixtures
    - allow tests to request access to resources with setup/teardown
    - example: built-in tempdir fixture
@@ -31,20 +45,6 @@
 ** parametrized fixtures
    - example: testing against several different databases
    - docs: http://bit.ly/pytest-fixture-params
-** test marking
-   - "tag" tests so as to select a subset to run
-   - example: marking slow tests
-     - mark tests (or test classes) using @pytest.mark.slow
-     - run just the slow tests with -m slow
-     - run just the fast tests with -m "not slow"
-   - example: pytest-poo! http://bit.ly/pytest-poo
-** test skipping and xfailing
-   - @pytest.mark.skipif(condition, reason=reason)
-   - example: skip tests on older Python versions
-   - use py.test -rs to report on all skips and the reasons for them
-   - similarly, @pytest.mark.xfail; -rx to report; --runxfail to run as if not xfailed
-   - docs: http://bit.ly/skipif
-** alternatives to py.test
 
 * WebTest
   - server-side testing of web applications

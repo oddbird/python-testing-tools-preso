@@ -26,11 +26,11 @@ This talk
 
 * py.test
 
+* test marking & skipping
+
 * fixtures
 
 * parametrized tests
-
-* test marking & skipping
 
 * WebTest
 
@@ -116,7 +116,7 @@ test_grades.py
 .. note::
 
    py.test will find and run tests in any file whose name begins with
-   "test\_". Test functions also need to have names beginning with "test\_".
+   "test\_". Test functions also need to have names beginning with "test".
 
    Matching up "grades.py" with "test_grades.py" is not necessary, though often
    helpful to keep tests organized.
@@ -125,11 +125,15 @@ test_grades.py
 
 ----
 
-::
+:data-emphasize-lines-step: 1,2,4,5,7,9
+
+.. code::
+   :number-lines:
 
    $ pip install pytest
 
-::
+.. code::
+   :number-lines:
 
    $ py.test
    ============== test session starts ========================
@@ -196,7 +200,201 @@ Choosing tests to run
 
 * Name a directory: ``py.test some/tests/``
 
-* Match a keyword in test function name: ``py.test -k grades``
+* Match test function/class name: ``py.test -k grades``
+
+* Select tests by "mark": ``py.test -m "not slow"``
+
+.. note::
+
+   Flexible matching of tests to run - very important for fast edit/test
+   cycles, especially in larger projects.
+
+   Select by mark - which raises the question...
+
+----
+
+:data-emphasize-lines-step: 3
+:data-reveal: 1
+
+Wait, what's a "mark"?
+----------------------
+
+.. code:: python
+   :number-lines:
+
+   import pytest
+
+   @pytest.mark.slow
+   def test_something_very_slow():
+       """Can download the internet."""
+       # ...
+
+* ``py.test -m slow`` will run only tests with this mark.
+
+* ``py.test -m "not slow"`` will run only tests without it.
+
+* Can also use ``and`` / ``or`` for conditions with multiple marks.
+
+.. note::
+
+   You can use any mark names you want (valid Python identifiers) or configure
+   a restricted set for the project in your ``pytest.ini`` file.
+
+----
+
+:data-emphasize-lines-step: 2,3,4,5,6,7,8,9
+
+pytest.ini
+----------
+
+.. code:: ini
+   :number-lines:
+
+   [pytest]
+   minversion = 2.4.2
+   addopts = --strict --cov-report html --cov myproj
+   norecursedirs = .* _* selenium node_modules qunit
+   python_files = test_*.py
+   python_classes = Test
+   python_functions = test
+   markers =
+       slow: mark a test as slow
+       web: mark a test as a web test
+
+.. note::
+
+   All optional.
+
+   If you use markers, recommended to list valid markers so there's one
+   reference point for all markers used, and typos become errors (with
+   ``strict``). At some point in the future pytest may require markers to be
+   registered.
+
+----
+
+:data-reveal: 1
+
+Classes?
+--------
+
+.. code:: python
+
+   class TestPager:
+       def test_num_pages(self):
+           """Can calculate total number of pages."""
+           assert pager(count=23, pagesize=10).num_pages == 3
+
+       def test_item_range(self):
+           """Can calculate range of items to be shown."""
+           # ...
+
+* Can use classes to group related tests, but not required.
+
+* Unlike ``unittest``, no special ``TestCase`` class to inherit from.
+
+* Avoid using classes for setup/teardown (use fixtures).
+
+* Avoid using classes to parametrize tests (use parametrized tests).
+
+----
+
+:data-emphasize-lines-step: 4,5
+
+Test skipping
+=============
+
+Not all tests can run in all environments.
+------------------------------------------
+
+.. code:: python
+   :number-lines:
+
+   import sys
+   import pytest
+
+   @pytest.mark.skipif(
+       sys.platform != 'win32', reason='Windows specific')
+   def test_updates_registry():
+       """Checks and updates registry entries."""
+       # ...
+
+.. note::
+
+   Can mark any test to be skipped under some conditions.
+
+----
+
+:data-emphasize-lines-step: 6,9,16
+
+.. code::
+   :number-lines:
+
+   $ py.test
+   ================ test session starts ======================
+   platform linux -- Python 3.3.2 -- py-1.4.20 -- pytest-2.5.2
+   collected 4 items
+
+   test_grades.py ...s
+
+   ================ 3 passed, 1 skipped in 0.02 seconds ======
+
+.. code::
+   :number-lines:
+
+   $ py.test -rs
+   ================ test session starts ======================
+   platform linux -- Python 3.3.2 -- py-1.4.20 -- pytest-2.5.2
+   collected 4 items
+
+   test_grades.py ...s
+   ================ short test summary info ==================
+   SKIP [1] /.../_pytest/skipping.py:132: Windows specific
+
+   ================ 3 passed, 1 skipped in 0.02 seconds ======
+
+.. note::
+
+   Skipped tests show up as an 's' instead of a '.'.
+
+   Run py.test with '-rs' to show reasons for skipped tests.
+
+----
+
+:data-emphasize-lines-step: 4,5
+:data-reveal: 1
+
+Expected failures
+=================
+
+Sometimes we expect a test to fail, for now.
+--------------------------------------------
+
+.. code:: python
+   :number-lines:
+
+   import sys
+   import pytest
+
+   @pytest.mark.xfail(
+       sys.version_info >= (3, 4), reason="Buggy on Py 3.4")
+   def test_something_that_doesnt_work_yet_on_python_34():
+       pass # ...
+
+* Just like ``-rs`` for skips, ``-rx`` will provide additional info on expected
+  failures.
+
+* ``xfail`` tests will report an ``X`` (``xpass`` or "unexpected pass") if they
+  pass.
+
+* Use ``--runxfail`` to run ``xfail`` tests normally (report failures as
+  failures).
+
+.. note::
+
+   May be a low priority bug that we plan to fix, or a feature we haven't fully
+   implemented yet.
+
+   Can also unconditionally xfail, provide only a reason.
 
 ----
 
@@ -206,8 +404,10 @@ Questions?
 ==========
 
 * `oddbird.net/python-testing-tools-preso`_
+* `pytest.org`_
 
 .. _oddbird.net/python-testing-tools-preso: http://oddbird.net/python-testing-tools-preso
+.. _pytest.org: http://pytest.org
 
 |hcard|
 
