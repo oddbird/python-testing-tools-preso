@@ -21,6 +21,17 @@ $(function () {
       var ln = linenos.eq(parseInt(num, 10)-1);
       return $('<span class="emphasized">&nbsp;</span>').insertBefore(ln);
     };
+    if (slide.data('pytest-highlight')) {
+      linenos.each(function () {
+        var textNode = this.nextSibling;
+        if (textNode.nodeType == 3) {
+          var text = textNode.nodeValue;
+          if ((text.indexOf('E') === 0) || (text.indexOf('failed in') > 0)) {
+            $(textNode).wrap('<span class="error"></span>');
+          }
+        }
+      });
+    }
     if (!slide.data('keep-linenos')) {
       linenos.html('');
     }

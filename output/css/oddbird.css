@@ -4904,3 +4904,7 @@ h2 tt {
 blockquote {
   font-style: italic;
 }
+
+ul {
+  width: 100%;
+}

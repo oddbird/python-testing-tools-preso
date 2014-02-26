@@ -359,3 +359,7 @@
 .emphasized.last {
   background: rgba(211, 54, 130, 0.15);
 }
+
+.error {
+  color: red;
+}

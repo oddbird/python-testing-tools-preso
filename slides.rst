@@ -28,9 +28,9 @@ This talk
 
 * test marking & skipping
 
-* fixtures
-
 * parametrized tests
+
+* fixtures
 
 * WebTest
 
@@ -81,6 +81,8 @@ Me
 
 ----
 
+:data-emphasize-lines-step: 9,10
+
 py.test
 =======
 
@@ -88,6 +90,7 @@ grades.py
 ---------
 
 .. code:: python
+   :number-lines:
 
    def get_level(min_grade, max_grade):
        if max_grade <= 6:
@@ -106,6 +109,7 @@ test_grades.py
 --------------
 
 .. code:: python
+   :number-lines:
 
    import grades
 
@@ -122,6 +126,8 @@ test_grades.py
    helpful to keep tests organized.
 
    (These naming conventions are customizable.)
+
+   Low-boilerplate tests: plain functions, plain asserts.
 
 ----
 
@@ -149,6 +155,36 @@ test_grades.py
    To run the tests, just "pip install pytest" and run "py.test" - it will
    automatically find and run your tests. Here it runs our one test, which
    passes!
+
+----
+
+:data-pytest-highlight: 1
+:data-emphasize-lines-step: 6,12,13,14,15
+
+helpful failures
+----------------
+
+.. code::
+   :number-lines:
+
+   $ py.test
+   ================ test session starts ======================
+   platform linux -- Python 3.3.2 -- py-1.4.20 -- pytest-2.5.2
+   collected 1 items
+
+   test_grades.py F
+
+   ================ FAILURES ==================================
+   ________________ test_get_level ____________________________
+
+       def test_get_level():
+   >       assert grades.get_level(2, 5) == 'secondary'
+   E       assert 'elementary' == 'secondary'
+   E         - elementary
+   E         + secondary
+
+   test_grades.py:4: AssertionError
+   ================ 1 failed in 0.02 seconds ==================
 
 ----
 
@@ -418,6 +454,54 @@ Marking classes
 * Can apply a mark to an entire test class.
 
 * Equivalent to applying it to each individual test method.
+
+----
+
+:data-reveal: 1
+
+Parametrized tests
+------------------
+
+* Running a set of similar tests with an array of different inputs and outputs.
+
+* Running the same test multiple times under different
+  configurations/conditions.
+
+----
+
+:data-emphasize-lines-step: 2,3,4,8,9
+:data-reveal: 1
+
+the naive approach
+------------------
+
+.. code:: python
+
+   def test_sum():
+       tests = [
+           ([], 0),
+           ([1, 2], 3),
+           ([0, 2], 2),
+           ([-4, 3, 2], 1),
+           ]
+       for inputs, output in tests:
+           assert sum(inputs) == output
+
+* Accomplishes the goal, but...
+
+* Early failure short-circuits (don't know which others would have failed).
+
+* For more complex cases, don't get e.g. separate setup/teardown.
+
+* Ideally these would each be treated as a separate test.
+
+----
+
+.. code:: python
+
+   import pytest
+
+   @pytest.mark.parametrize()
 
 ----
 
