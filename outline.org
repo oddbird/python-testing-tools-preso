@@ -56,6 +56,7 @@
   - example: testing a JSON Ajax response
   - docs: http://bit.ly/python-webtest
 
+* factory-boy
 * tox
   - easily run your tests across a matrix of environments
     - different Python versions

@@ -398,6 +398,191 @@ Sometimes we expect a test to fail, for now.
 
 ----
 
+:data-reveal: 1
+
+Marking classes
+---------------
+
+.. code:: python
+
+   import pytest
+
+   @pytest.mark.xfail
+   class TestPager:
+       def test_num_pages(self):
+           pass # ...
+
+       def test_item_range(self):
+           pass # ...
+
+* Can apply a mark to an entire test class.
+
+* Equivalent to applying it to each individual test method.
+
+----
+
+:data-reveal: 1
+
+py.test fixtures
+================
+
+* Each test should run in a predictable, repeatable, baseline environment.
+
+* Some tests need resources (a database, the filesystem, an initialized code
+  object) that may require some **setup** and **teardown** in order to provide
+  a predictable environment.
+
+* py.test fixtures are a modular system for defining such resources and
+  allowing tests to request access to them.
+
+----
+
+:data-emphasize-lines-step: 5,7,8,9,12
+
+Example: tempdir
+----------------
+
+.. code:: python
+   :number-lines:
+
+   import shutil
+   from tempfile import mkdtemp
+   import pytest
+
+   @pytest.yield_fixture
+   def tempdir():
+       temp_dir_path = mkdtemp()
+       yield temp_dir_path
+       shutil.rmtree(temp_dir_path)
+
+.. code:: python
+   :number-lines:
+
+   import os
+
+   def test_write_config(tempdir):
+       """Writes config to the given file path."""
+       config_file_path = os.path.join(tempdir, 'test.cfg')
+       # ...
+
+.. note::
+
+   Py.test actually provides this as a built-in fixture; but it's a nice simple
+   example, so we'll reimplement it.
+
+   This is a new way to define fixtures, using yield, thus the name of the
+   decorator.
+
+   A test requests the fixture by asking for an argument of that name, py.test
+   uses introspection to check the argument names and provide the right fixture
+   values.
+
+   Each test that requires the fixture will get a new one; the setup and
+   teardown will be re-executed for every test.
+
+   (The built-in tempdir fixture is a little more complex than this; it leaves
+   the last few temp dirs laying around to help with debugging failing tests,
+   and cleans up older ones only.)
+
+----
+
+:data-reveal: 1
+
+Fixture lifecycle scopes
+------------------------
+
+* Default scope is "function": new fixture will be setup and torn down for
+  each test.
+
+* Other scopes: "class", "module", "session".
+
+* Setup new fixture once per test class, test module, or test session.
+
+----
+
+:data-emphasize-lines-step: 3,5,6,7,8,9
+
+
+Session-scope fixture
+---------------------
+
+.. code:: python
+   :number-lines:
+
+   import pytest
+
+   @pytest.yield_fixture(scope='session')
+   def db():
+       create_test_database()
+       conn = get_test_database_connection()
+       yield conn
+       destroy_test_database()
+
+.. code:: python
+   :number-lines:
+
+   def test_query(db):
+       pass # ...
+
+.. note::
+
+   I find few good use cases for class or module-scope fixtures; I'll just give
+   an example of a session-scope fixture.
+
+   Creating and destroying a database is too slow to do every test; just want
+   to create the test db once at start of test run and destroy it at the end. A
+   session-scoped fixture allows this.
+
+   Fixture is lazy: only set up when a test asks for it. So if we run a subset
+   of our tests that don't ask for the ``db`` fixture, no test db will be
+   created for that run - a nice speed boost.
+
+   Problem: database state is not reset between tests. If we add rows in one
+   test, that could disrupt another test. Violates goal of a repeatable,
+   predictable environment for each test.
+
+----
+
+:data-emphasize-lines-step: 4,11,12,13,14
+
+Paired fixtures
+---------------
+
+.. code:: python
+   :number-lines:
+
+   import pytest
+
+   @pytest.yield_fixture(scope='session')
+   def db_conn():
+       create_test_database()
+       conn = get_test_database_connection()
+       yield conn
+       destroy_test_database()
+
+   @pytest.yield_fixture
+   def db(db_conn):
+       yield db_conn
+       db_conn.truncate_all_tables()
+
+.. code:: python
+   :number-lines:
+
+   def test_query(db):
+       pass # ...
+
+.. note::
+
+   Session-scope fixture to create and teardown the test database.
+
+   Function-scope fixture that uses the session-scope fixture and passes it on
+   to each test, also restoring the database state after each test.
+
+   (Might also be other approaches to restoring state, like running each test
+   in a transaction and rolling it back.)
+
+----
+
 :id: questions
 
 Questions?

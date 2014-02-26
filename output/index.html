@@ -89,7 +89,69 @@ registered.</p></div></div><div class="step" step="10" data-reveal="1" data-x="1
 failures.</li><li><tt>xfail</tt> tests will report an <tt>X</tt> (<tt>xpass</tt> or "unexpected pass") if they
 pass.</li><li>Use <tt>--runxfail</tt> to run <tt>xfail</tt> tests normally (report failures as
 failures).</li></ul><div class="notes"><p>May be a low priority bug that we plan to fix, or a feature we haven't fully
-implemented yet.</p><p>Can also unconditionally xfail, provide only a reason.</p></div></div><div class="step" step="14" id="questions" data-x="22400" data-y="0"><h1 id="questions">Questions?</h1><ul><li><a href="http://oddbird.net/python-testing-tools-preso">oddbird.net/python-testing-tools-preso</a></li><li><a href="http://pytest.org">pytest.org</a></li></ul><p><div class="vcard">
+implemented yet.</p><p>Can also unconditionally xfail, provide only a reason.</p></div></div><div class="step" step="14" data-reveal="1" data-x="22400" data-y="0"><h1 id="marking-classes">Marking classes</h1><pre class="highlight code python"><span class="kn">import</span> <span class="nn">pytest</span>
+
+<span class="nd">@pytest.mark.xfail</span>
+<span class="k">class</span> <span class="nc">TestPager</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">test_num_pages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span> <span class="c"># ...</span>
+
+    <span class="k">def</span> <span class="nf">test_item_range</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span> <span class="c"># ...</span></pre><ul><li>Can apply a mark to an entire test class.</li><li>Equivalent to applying it to each individual test method.</li></ul></div><div class="step" step="15" data-reveal="1" data-x="24000" data-y="0"><h1 id="py-test-fixtures">py.test fixtures</h1><ul><li>Each test should run in a predictable, repeatable, baseline environment.</li><li>Some tests need resources (a database, the filesystem, an initialized code
+object) that may require some <strong>setup</strong> and <strong>teardown</strong> in order to provide
+a predictable environment.</li><li>py.test fixtures are a modular system for defining such resources and
+allowing tests to request access to them.</li></ul></div><div class="step" step="16" data-emphasize-lines-step="5,7,8,9,12" data-x="25600" data-y="0"><h1 id="example-tempdir">Example: tempdir</h1><pre class="highlight code python"><span class="ln"> 1 </span><span class="kn">import</span> <span class="nn">shutil</span>
+<span class="ln"> 2 </span><span class="kn">from</span> <span class="nn">tempfile</span> <span class="kn">import</span> <span class="n">mkdtemp</span>
+<span class="ln"> 3 </span><span class="kn">import</span> <span class="nn">pytest</span>
+<span class="ln"> 4 </span>
+<span class="ln"> 5 </span><span class="nd">@pytest.yield_fixture</span>
+<span class="ln"> 6 </span><span class="k">def</span> <span class="nf">tempdir</span><span class="p">():</span>
+<span class="ln"> 7 </span>    <span class="n">temp_dir_path</span> <span class="o">=</span> <span class="n">mkdtemp</span><span class="p">()</span>
+<span class="ln"> 8 </span>    <span class="k">yield</span> <span class="n">temp_dir_path</span>
+<span class="ln"> 9 </span>    <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">temp_dir_path</span><span class="p">)</span></pre><pre class="highlight code python"><span class="ln">1 </span><span class="kn">import</span> <span class="nn">os</span>
+<span class="ln">2 </span>
+<span class="ln">3 </span><span class="k">def</span> <span class="nf">test_write_config</span><span class="p">(</span><span class="n">tempdir</span><span class="p">):</span>
+<span class="ln">4 </span>    <span class="sd">"""Writes config to the given file path."""</span>
+<span class="ln">5 </span>    <span class="n">config_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tempdir</span><span class="p">,</span> <span class="s">'test.cfg'</span><span class="p">)</span>
+<span class="ln">6 </span>    <span class="c"># ...</span></pre><div class="notes"><p>Py.test actually provides this as a built-in fixture; but it's a nice simple
+example, so we'll reimplement it.</p><p>This is a new way to define fixtures, using yield, thus the name of the
+decorator.</p><p>A test requests the fixture by asking for an argument of that name, py.test
+uses introspection to check the argument names and provide the right fixture
+values.</p><p>Each test that requires the fixture will get a new one; the setup and
+teardown will be re-executed for every test.</p><p>(The built-in tempdir fixture is a little more complex than this; it leaves
+the last few temp dirs laying around to help with debugging failing tests,
+and cleans up older ones only.)</p></div></div><div class="step" step="17" data-reveal="1" data-x="27200" data-y="0"><h1 id="fixture-lifecycle-scopes">Fixture lifecycle scopes</h1><ul><li>Default scope is "function": new fixture will be setup and torn down for
+each test.</li><li>Other scopes: "class", "module", "session".</li><li>Setup new fixture once per test class, test module, or test session.</li></ul></div><div class="step" step="18" data-emphasize-lines-step="3,5,6,7,8,9" data-x="28800" data-y="0"><h1 id="session-scope-fixture">Session-scope fixture</h1><pre class="highlight code python"><span class="ln">1 </span><span class="kn">import</span> <span class="nn">pytest</span>
+<span class="ln">2 </span>
+<span class="ln">3 </span><span class="nd">@pytest.yield_fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s">'session'</span><span class="p">)</span>
+<span class="ln">4 </span><span class="k">def</span> <span class="nf">db</span><span class="p">():</span>
+<span class="ln">5 </span>    <span class="n">create_test_database</span><span class="p">()</span>
+<span class="ln">6 </span>    <span class="n">conn</span> <span class="o">=</span> <span class="n">get_test_database_connection</span><span class="p">()</span>
+<span class="ln">7 </span>    <span class="k">yield</span> <span class="n">conn</span>
+<span class="ln">8 </span>    <span class="n">destroy_test_database</span><span class="p">()</span></pre><pre class="highlight code python"><span class="ln">1 </span><span class="k">def</span> <span class="nf">test_query</span><span class="p">(</span><span class="n">db</span><span class="p">):</span>
+<span class="ln">2 </span>    <span class="k">pass</span> <span class="c"># ...</span></pre><div class="notes"><p>I find few good use cases for class or module-scope fixtures; I'll just give
+an example of a session-scope fixture.</p><p>Creating and destroying a database is too slow to do every test; just want
+to create the test db once at start of test run and destroy it at the end. A
+session-scoped fixture allows this.</p><p>Fixture is lazy: only set up when a test asks for it. So if we run a subset
+of our tests that don't ask for the <tt>db</tt> fixture, no test db will be
+created for that run - a nice speed boost.</p><p>Problem: database state is not reset between tests. If we add rows in one
+test, that could disrupt another test. Violates goal of a repeatable,
+predictable environment for each test.</p></div></div><div class="step" step="19" data-emphasize-lines-step="4,11,12,13,14" data-x="30400" data-y="0"><h1 id="paired-fixtures">Paired fixtures</h1><pre class="highlight code python"><span class="ln"> 1 </span><span class="kn">import</span> <span class="nn">pytest</span>
+<span class="ln"> 2 </span>
+<span class="ln"> 3 </span><span class="nd">@pytest.yield_fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s">'session'</span><span class="p">)</span>
+<span class="ln"> 4 </span><span class="k">def</span> <span class="nf">db_conn</span><span class="p">():</span>
+<span class="ln"> 5 </span>    <span class="n">create_test_database</span><span class="p">()</span>
+<span class="ln"> 6 </span>    <span class="n">conn</span> <span class="o">=</span> <span class="n">get_test_database_connection</span><span class="p">()</span>
+<span class="ln"> 7 </span>    <span class="k">yield</span> <span class="n">conn</span>
+<span class="ln"> 8 </span>    <span class="n">destroy_test_database</span><span class="p">()</span>
+<span class="ln"> 9 </span>
+<span class="ln">10 </span><span class="nd">@pytest.yield_fixture</span>
+<span class="ln">11 </span><span class="k">def</span> <span class="nf">db</span><span class="p">(</span><span class="n">db_conn</span><span class="p">):</span>
+<span class="ln">12 </span>    <span class="k">yield</span> <span class="n">db_conn</span>
+<span class="ln">13 </span>    <span class="n">db_conn</span><span class="o">.</span><span class="n">truncate_all_tables</span><span class="p">()</span></pre><pre class="highlight code python"><span class="ln">1 </span><span class="k">def</span> <span class="nf">test_query</span><span class="p">(</span><span class="n">db</span><span class="p">):</span>
+<span class="ln">2 </span>    <span class="k">pass</span> <span class="c"># ...</span></pre><div class="notes"><p>Session-scope fixture to create and teardown the test database.</p><p>Function-scope fixture that uses the session-scope fixture and passes it on
+to each test, also restoring the database state after each test.</p><p>(Might also be other approaches to restoring state, like running each test
+in a transaction and rolling it back.)</p></div></div><div class="step" step="20" id="questions" data-x="32000" data-y="0"><h1 id="questions">Questions?</h1><ul><li><a href="http://oddbird.net/python-testing-tools-preso">oddbird.net/python-testing-tools-preso</a></li><li><a href="http://pytest.org">pytest.org</a></li></ul><p><div class="vcard">
 <a href="http://www.oddbird.net">
   <img src="images/logo.svg" alt="OddBird" class="logo" />
 </a>
