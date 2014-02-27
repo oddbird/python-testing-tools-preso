@@ -7,8 +7,8 @@
   <li><a href="http://www.oddbird.net" class="org url">oddbird.net</a></li>
   <li><a href="https://twitter.com/carljm" rel="me">@carljm</a></li>
 </ul>
-</div></p></div><div class="step" step="1" id="thistalk" data-reveal="1" data-x="1600" data-y="0"><h1 id="this-talk">This talk</h1><ul><li>py.test</li><li>test marking &amp; skipping</li><li>parametrized tests</li><li>fixtures</li><li>WebTest</li><li>tox</li><li>mock &amp; pretend</li><li>coverage</li></ul></div><div class="step" step="2" data-reveal="1" data-x="3200" data-y="0"><h1 id="how">How</h1><ul><li>Introduce a feature</li><li>Example(s)</li><li>Just a taste!</li><li>Link to docs</li><li>Python 3</li></ul><div class="notes"><p>Docs links on final slide. No stress; doc links will be live in online
-slides.</p><p>All code is Py3, but will note Py2 differences.</p></div></div><div class="step" step="3" data-reveal="1" data-x="4800" data-y="0"><h1 id="me">Me</h1><ul><li>Writing Python since 2002.</li><li>Professionally since 2007.</li><li>Mostly web development.</li><li>OSS: pip, virtualenv, Django</li></ul></div><div class="step" step="4" data-emphasize-lines-step="9,10" data-x="6400" data-y="0"><h1 id="py-test">py.test</h1><h2 id="grades-py">grades.py</h2><pre class="highlight code python"><span class="ln">1 </span><span class="k">def</span> <span class="nf">get_level</span><span class="p">(</span><span class="n">min_grade</span><span class="p">,</span> <span class="n">max_grade</span><span class="p">):</span>
+</div></p></div><div class="step" step="1" id="thistalk" data-reveal="1" data-x="1600" data-y="0"><h1 id="this-talk">This talk</h1><ul><li>py.test</li><li>test marking &amp; skipping</li><li>parametrized tests</li><li>fixtures</li><li>coverage</li><li>tox</li><li>mock &amp; pretend</li><li>WebTest</li></ul></div><div class="step" step="2" data-reveal="1" data-x="3200" data-y="0"><h1 id="how">How</h1><ul><li>Introduce a feature</li><li>Example(s)</li><li>Further exploration</li><li>Link to docs</li><li>Python 3</li></ul><div class="notes"><p>Docs links on final slide. No stress; doc links will be live in online
+slides.</p><p>All code is Py3, but will note Py2 differences.</p></div></div><div class="step" step="3" data-reveal="1" data-x="4800" data-y="0"><h1 id="me">Me</h1><ul><li>Writing Python since 2002.</li><li>Professionally since 2007.</li><li>Mostly web development.</li><li>OSS: pip, virtualenv, Django</li></ul></div><div class="step" step="4" data-emphasize-lines-step="1,3,5,7,9,10" data-x="6400" data-y="0"><h1 id="py-test">py.test</h1><h2 id="grades-py">grades.py</h2><pre class="highlight code python"><span class="ln">1 </span><span class="k">def</span> <span class="nf">get_level</span><span class="p">(</span><span class="n">min_grade</span><span class="p">,</span> <span class="n">max_grade</span><span class="p">):</span>
 <span class="ln">2 </span>    <span class="k">if</span> <span class="n">max_grade</span> <span class="o">&lt;=</span> <span class="mi">6</span><span class="p">:</span>
 <span class="ln">3 </span>        <span class="k">return</span> <span class="s">'elementary'</span>
 <span class="ln">4 </span>    <span class="k">if</span> <span class="n">min_grade</span> <span class="o">&gt;</span> <span class="mi">6</span><span class="p">:</span>
@@ -27,7 +27,7 @@ helpful to keep tests organized.</p><p>(These naming conventions are customizabl
 <span class="ln">7 </span>
 <span class="ln">8 </span>============== 1 passed in 0.01 seconds ===================</pre><div class="notes"><p>To run the tests, just "pip install pytest" and run "py.test" - it will
 automatically find and run your tests. Here it runs our one test, which
-passes!</p></div></div><div class="step" step="6" data-pytest-highlight="1" data-emphasize-lines-step="6,12,13,14,15" data-x="9600" data-y="0"><h1 id="helpful-failures">helpful failures</h1><pre class="highlight code"><span class="ln"> 1 </span>$ py.test
+passes!</p></div></div><div class="step" step="6" data-pytest-highlight="1" data-emphasize-lines-step="6,12,13,14,15" data-x="9600" data-y="0"><h1 id="helpful-failures">Helpful failures</h1><pre class="highlight code"><span class="ln"> 1 </span>$ py.test
 <span class="ln"> 2 </span>================ test session starts ======================
 <span class="ln"> 3 </span>platform linux -- Python 3.3.2 -- py-1.4.20 -- pytest-2.5.2
 <span class="ln"> 4 </span>collected 1 items
@@ -115,20 +115,50 @@ implemented yet.</p><p>Can also unconditionally xfail, provide only a reason.</p
 
     <span class="k">def</span> <span class="nf">test_item_range</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span> <span class="c"># ...</span></pre><ul><li>Can apply a mark to an entire test class.</li><li>Equivalent to applying it to each individual test method.</li></ul></div><div class="step" step="16" data-reveal="1" data-x="25600" data-y="0"><h1 id="parametrized-tests">Parametrized tests</h1><ul><li>Running a set of similar tests with an array of different inputs and outputs.</li><li>Running the same test multiple times under different
-configurations/conditions.</li></ul></div><div class="step" step="17" data-emphasize-lines-step="2,3,4,8,9" data-reveal="1" data-x="27200" data-y="0"><h1 id="the-naive-approach">the naive approach</h1><pre class="highlight code python"><span class="k">def</span> <span class="nf">test_sum</span><span class="p">():</span>
-    <span class="n">tests</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="p">([],</span> <span class="mi">0</span><span class="p">),</span>
-        <span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="mi">3</span><span class="p">),</span>
-        <span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="mi">2</span><span class="p">),</span>
-        <span class="p">([</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="mi">1</span><span class="p">),</span>
-        <span class="p">]</span>
-    <span class="k">for</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">output</span> <span class="ow">in</span> <span class="n">tests</span><span class="p">:</span>
-        <span class="k">assert</span> <span class="nb">sum</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span> <span class="o">==</span> <span class="n">output</span></pre><ul><li>Accomplishes the goal, but...</li><li>Early failure short-circuits (don't know which others would have failed).</li><li>For more complex cases, don't get e.g. separate setup/teardown.</li><li>Ideally these would each be treated as a separate test.</li></ul></div><div class="step" step="18" data-x="28800" data-y="0"><pre class="highlight code python"><span class="kn">import</span> <span class="nn">pytest</span>
-
-<span class="nd">@pytest.mark.parametrize</span><span class="p">()</span></pre></div><div class="step" step="19" data-reveal="1" data-x="30400" data-y="0"><h1 id="py-test-fixtures">py.test fixtures</h1><ul><li>Each test should run in a predictable, repeatable, baseline environment.</li><li>Some tests need resources (a database, the filesystem, an initialized code
+configurations/conditions.</li></ul></div><div class="step" step="17" data-emphasize-lines-step="2,3,4,8,9" data-reveal="1" data-x="27200" data-y="0"><h1 id="naive-approach">Naive approach</h1><pre class="highlight code python"><span class="ln"> 1 </span><span class="k">def</span> <span class="nf">test_sum</span><span class="p">():</span>
+<span class="ln"> 2 </span>    <span class="n">tests</span> <span class="o">=</span> <span class="p">[</span>
+<span class="ln"> 3 </span>        <span class="p">([],</span> <span class="mi">0</span><span class="p">),</span>
+<span class="ln"> 4 </span>        <span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="mi">3</span><span class="p">),</span>
+<span class="ln"> 5 </span>        <span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="mi">2</span><span class="p">),</span>
+<span class="ln"> 6 </span>        <span class="p">([</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="mi">1</span><span class="p">),</span>
+<span class="ln"> 7 </span>        <span class="p">]</span>
+<span class="ln"> 8 </span>    <span class="k">for</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">output</span> <span class="ow">in</span> <span class="n">tests</span><span class="p">:</span>
+<span class="ln"> 9 </span>        <span class="k">assert</span> <span class="nb">sum</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span> <span class="o">==</span> <span class="n">output</span></pre><ul><li>Accomplishes the goal, but...</li><li>Early failure short-circuits (don't know which others would have failed).</li><li>For more complex cases, don't get e.g. separate setup/teardown.</li><li>Ideally these would each be treated as a separate test.</li></ul></div><div class="step" step="18" data-emphasize-lines-step="3,4,5,6,7,8,9,10" data-x="28800" data-y="0"><h1 id="test-sum-py">test_sum.py</h1><pre class="highlight code python"><span class="ln"> 1 </span><span class="kn">import</span> <span class="nn">pytest</span>
+<span class="ln"> 2 </span>
+<span class="ln"> 3 </span><span class="nd">@pytest.mark.parametrize</span><span class="p">(</span>
+<span class="ln"> 4 </span>    <span class="s">'inputs,output'</span><span class="p">,</span>
+<span class="ln"> 5 </span>    <span class="p">[</span>   <span class="p">([],</span> <span class="mi">0</span><span class="p">),</span>
+<span class="ln"> 6 </span>        <span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="mi">3</span><span class="p">),</span>
+<span class="ln"> 7 </span>        <span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="mi">2</span><span class="p">),</span>
+<span class="ln"> 8 </span>        <span class="p">([</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span>  <span class="p">])</span>
+<span class="ln"> 9 </span><span class="k">def</span> <span class="nf">test_sum</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">output</span><span class="p">):</span>
+<span class="ln">10 </span>    <span class="k">assert</span> <span class="nb">sum</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span> <span class="o">==</span> <span class="n">output</span></pre></div><div class="step" step="19" data-emphasize-lines-step="1,4,6,10,20,21" data-pytest-highlight="1" data-x="30400" data-y="0"><pre class="highlight code"><span class="ln"> 1 </span>$ py.test test_sum.py
+<span class="ln"> 2 </span>=============== test session starts =======================
+<span class="ln"> 3 </span>platform linux -- Python 3.3.2 -- py-1.4.20 -- pytest-2.5.2
+<span class="ln"> 4 </span>collected 4 items
+<span class="ln"> 5 </span>
+<span class="ln"> 6 </span>test_sum.py ...F
+<span class="ln"> 7 </span>
+<span class="ln"> 8 </span>================ FAILURES =================================
+<span class="ln"> 9 </span>________________ test_sum[inputs3-2] ______________________
+<span class="ln">10 </span>inputs = [-4, 3, 2], output = 2
+<span class="ln">11 </span>
+<span class="ln">12 </span>    @pytest.mark.parametrize(
+<span class="ln">13 </span>        'inputs,output',
+<span class="ln">14 </span>        [   ([], 0),
+<span class="ln">15 </span>            ([1, 2], 3),
+<span class="ln">16 </span>            ([0, 2], 2),
+<span class="ln">17 </span>            ([-4, 3, 2], 2)  ])
+<span class="ln">18 </span>    def test_sum(inputs, output):
+<span class="ln">19 </span>&gt;       assert sum(inputs) == output
+<span class="ln">20 </span>E       assert 1 == 2
+<span class="ln">21 </span>E        +  where 1 = sum([-4, 3, 2])
+<span class="ln">22 </span>
+<span class="ln">23 </span>test_sum.py:13: AssertionError
+<span class="ln">24 </span>================ 1 failed, 3 passed in 0.02 seconds =======</pre></div><div class="step" step="20" data-reveal="1" data-x="32000" data-y="0"><h1 id="py-test-fixtures">py.test fixtures</h1><ul><li>Each test should run in a predictable, repeatable, baseline environment.</li><li>Some tests need resources (a database, the filesystem, an initialized code
 object) that may require some <strong>setup</strong> and <strong>teardown</strong> in order to provide
 a predictable environment.</li><li>py.test fixtures are a modular system for defining such resources and
-allowing tests to request access to them.</li></ul></div><div class="step" step="20" data-emphasize-lines-step="5,7,8,9,12" data-x="32000" data-y="0"><h1 id="example-tempdir">Example: tempdir</h1><pre class="highlight code python"><span class="ln"> 1 </span><span class="kn">import</span> <span class="nn">shutil</span>
+allowing tests to request access to them.</li></ul></div><div class="step" step="21" data-emphasize-lines-step="5,7,8,9,12" data-x="33600" data-y="0"><h1 id="example-tempdir">Example: tempdir</h1><pre class="highlight code python"><span class="ln"> 1 </span><span class="kn">import</span> <span class="nn">shutil</span>
 <span class="ln"> 2 </span><span class="kn">from</span> <span class="nn">tempfile</span> <span class="kn">import</span> <span class="n">mkdtemp</span>
 <span class="ln"> 3 </span><span class="kn">import</span> <span class="nn">pytest</span>
 <span class="ln"> 4 </span>
@@ -148,8 +178,8 @@ uses introspection to check the argument names and provide the right fixture
 values.</p><p>Each test that requires the fixture will get a new one; the setup and
 teardown will be re-executed for every test.</p><p>(The built-in tempdir fixture is a little more complex than this; it leaves
 the last few temp dirs laying around to help with debugging failing tests,
-and cleans up older ones only.)</p></div></div><div class="step" step="21" data-reveal="1" data-x="33600" data-y="0"><h1 id="fixture-lifecycle-scopes">Fixture lifecycle scopes</h1><ul><li>Default scope is "function": new fixture will be setup and torn down for
-each test.</li><li>Other scopes: "class", "module", "session".</li><li>Setup new fixture once per test class, test module, or test session.</li></ul></div><div class="step" step="22" data-emphasize-lines-step="3,5,6,7,8,9" data-x="35200" data-y="0"><h1 id="session-scope-fixture">Session-scope fixture</h1><pre class="highlight code python"><span class="ln">1 </span><span class="kn">import</span> <span class="nn">pytest</span>
+and cleans up older ones only.)</p></div></div><div class="step" step="22" data-reveal="1" data-x="35200" data-y="0"><h1 id="fixture-lifecycle-scopes">Fixture lifecycle scopes</h1><ul><li>Default scope is "function": new fixture will be setup and torn down for
+each test that requests it.</li><li>Other scopes: "class", "module", "session".</li><li>Setup new fixture once per test class, test module, or test session.</li></ul></div><div class="step" step="23" data-emphasize-lines-step="3,5,6,7,8,9" data-x="36800" data-y="0"><h1 id="session-scope-fixture">Session-scope fixture</h1><pre class="highlight code python"><span class="ln">1 </span><span class="kn">import</span> <span class="nn">pytest</span>
 <span class="ln">2 </span>
 <span class="ln">3 </span><span class="nd">@pytest.yield_fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s">'session'</span><span class="p">)</span>
 <span class="ln">4 </span><span class="k">def</span> <span class="nf">db</span><span class="p">():</span>
@@ -164,7 +194,7 @@ session-scoped fixture allows this.</p><p>Fixture is lazy: only set up when a te
 of our tests that don't ask for the <tt>db</tt> fixture, no test db will be
 created for that run - a nice speed boost.</p><p>Problem: database state is not reset between tests. If we add rows in one
 test, that could disrupt another test. Violates goal of a repeatable,
-predictable environment for each test.</p></div></div><div class="step" step="23" data-emphasize-lines-step="4,11,12,13,14" data-x="36800" data-y="0"><h1 id="paired-fixtures">Paired fixtures</h1><pre class="highlight code python"><span class="ln"> 1 </span><span class="kn">import</span> <span class="nn">pytest</span>
+predictable environment for each test.</p></div></div><div class="step" step="24" data-emphasize-lines-step="4,11,12,13,14" data-x="38400" data-y="0"><h1 id="paired-fixtures">Paired fixtures</h1><pre class="highlight code python"><span class="ln"> 1 </span><span class="kn">import</span> <span class="nn">pytest</span>
 <span class="ln"> 2 </span>
 <span class="ln"> 3 </span><span class="nd">@pytest.yield_fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s">'session'</span><span class="p">)</span>
 <span class="ln"> 4 </span><span class="k">def</span> <span class="nf">db_conn</span><span class="p">():</span>
@@ -179,7 +209,26 @@ predictable environment for each test.</p></div></div><div class="step" step="23
 <span class="ln">13 </span>    <span class="n">db_conn</span><span class="o">.</span><span class="n">truncate_all_tables</span><span class="p">()</span></pre><pre class="highlight code python"><span class="ln">1 </span><span class="k">def</span> <span class="nf">test_query</span><span class="p">(</span><span class="n">db</span><span class="p">):</span>
 <span class="ln">2 </span>    <span class="k">pass</span> <span class="c"># ...</span></pre><div class="notes"><p>Session-scope fixture to create and teardown the test database.</p><p>Function-scope fixture that uses the session-scope fixture and passes it on
 to each test, also restoring the database state after each test.</p><p>(Might also be other approaches to restoring state, like running each test
-in a transaction and rolling it back.)</p></div></div><div class="step" step="24" id="questions" data-x="38400" data-y="0"><h1 id="questions">Questions?</h1><ul><li><a href="http://oddbird.net/python-testing-tools-preso">oddbird.net/python-testing-tools-preso</a></li><li><a href="http://pytest.org">pytest.org</a></li></ul><p><div class="vcard">
+in a transaction and rolling it back.)</p></div></div><div class="step" step="25" data-emphasize-lines-step="1,2,3,4,5,10,11" data-x="40000" data-y="0"><h1 id="parametrized-fixtures">Parametrized fixtures</h1><pre class="highlight code python"><span class="ln"> 1 </span><span class="nd">@pytest.yield_fixture</span><span class="p">(</span>
+<span class="ln"> 2 </span>    <span class="n">params</span><span class="o">=</span><span class="p">[</span><span class="s">'sqlite'</span><span class="p">,</span> <span class="s">'mysql'</span><span class="p">,</span> <span class="s">'postgres'</span><span class="p">])</span>
+<span class="ln"> 3 </span><span class="k">def</span> <span class="nf">db_conn</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<span class="ln"> 4 </span>    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">param</span> <span class="o">==</span> <span class="s">'sqlite'</span><span class="p">:</span>
+<span class="ln"> 5 </span>        <span class="n">conn</span> <span class="o">=</span> <span class="n">create_sqlite_test_database</span><span class="p">()</span>
+<span class="ln"> 6 </span>    <span class="k">elif</span> <span class="n">request</span><span class="o">.</span><span class="n">param</span> <span class="o">==</span> <span class="s">'mysql'</span><span class="p">:</span>
+<span class="ln"> 7 </span>        <span class="n">conn</span> <span class="o">=</span> <span class="n">create_mysql_test_database</span><span class="p">()</span>
+<span class="ln"> 8 </span>    <span class="k">elif</span> <span class="n">request</span><span class="o">.</span><span class="n">param</span> <span class="o">==</span> <span class="s">'postgres'</span><span class="p">:</span>
+<span class="ln"> 9 </span>        <span class="n">conn</span> <span class="o">=</span> <span class="n">create_postgres_test_database</span><span class="p">()</span>
+<span class="ln">10 </span>    <span class="k">yield</span> <span class="n">conn</span>
+<span class="ln">11 </span>    <span class="n">destroy_test_database</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span></pre><div class="notes"><p>Say we have some tests using a database, and we want to automatically run
+all of those tests against all of our supported databases.</p><p>We can take a db fixture like we saw above, and parametrize it.</p><p>Now any test that uses this fixture will run three times, once with each
+value for <tt>request.param</tt>.</p><p>Tests that don't use the <tt>db</tt> fixture unaffected.</p></div></div><div class="step" step="26" data-reveal="1" data-x="41600" data-y="0"><h1 id="py-test-plugins">py.test plugins</h1><ul><li><a href="http://pytest.org/latest/xdist.html">pytest-xdist</a></li><li><a href="https://pypi.python.org/pypi/pytest-cov">pytest-cov</a></li><li><a href="https://pypi.python.org/pypi/pytest-bdd">pytest-bdd</a> / <a href="https://pypi.python.org/pypi/pytest-konira">pytest-konira</a></li><li><a href="https://pypi.python.org/pypi/pytest-flakes">pytest-flakes</a></li><li><a href="https://pypi.python.org/pypi/pytest-django">pytest-django</a></li><li><a href="https://pypi.python.org/pypi/pytest-twisted">pytest-twisted</a></li><li><a href="https://pypi.python.org/pypi/pytest-capturelog">pytest-capturelog</a></li><li>...</li></ul></div><div class="step" step="27" data-reveal="1" data-x="43200" data-y="0"><h1 id="py-test-review">py.test review</h1><ul><li>write tests as <strong>simple functions</strong> with <strong>asserts</strong>.</li><li>run the <strong>specific tests</strong> you want.</li><li>get <strong>helpful debugging information</strong> when tests fail.</li><li>mark tests to be <strong>skipped</strong> or as <strong>expected-fails</strong>.</li><li>modular <strong>fixtures</strong> for resources required by tests.</li><li><strong>parametrize</strong> individual tests and fixtures.</li><li>many, many <strong>plugins</strong>.</li></ul></div><div class="step" step="28" data-reveal="1" data-emphasize-lines-step="1,3,5,8" data-x="44800" data-y="0"><h1 id="measuring-test-coverage">Measuring test coverage</h1><p>How much of my production code is exercised by my test suite?</p><pre class="highlight code"><span class="ln">1 </span>$ pip install coverage
+<span class="ln">2 </span>
+<span class="ln">3 </span>$ coverage run --branch `which py.test`
+<span class="ln">4 </span>
+<span class="ln">5 </span>$ coverage report --include=grades.py
+<span class="ln">6 </span>Name     Stmts   Miss Branch BrMiss  Cover
+<span class="ln">7 </span>------------------------------------------
+<span class="ln">8 </span>grades       6      3      4      3    40%</pre></div><div class="step" step="29" data-x="46400" data-y="0"><pre class="highlight code">$ coverage html</pre><img src="images/coverage.png" alt="" width="770px" height=""></img><div class="notes"><p>100% coverage not guarantee of adequate tests, but roughly minimum bound.</p></div></div><div class="step" step="30" id="questions" data-x="48000" data-y="0"><h1 id="questions">Questions?</h1><ul><li><a href="http://oddbird.net/python-testing-tools-preso">oddbird.net/python-testing-tools-preso</a></li><li><a href="http://pytest.org">pytest.org</a></li><li><a href="http://nedbatchelder.com/code/coverage/">nedbatchelder.com/code/coverage/</a></li></ul><p><div class="vcard">
 <a href="http://www.oddbird.net">
   <img src="images/logo.svg" alt="OddBird" class="logo" />
 </a>

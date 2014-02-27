@@ -45,6 +45,24 @@
 ** parametrized fixtures
    - example: testing against several different databases
    - docs: http://bit.ly/pytest-fixture-params
+** plugins
+
+* coverage
+  - which lines of my code are not executed when I run my test suite?
+    - (or, which branches of my code are not taken; not necessarily the same thing)
+  - pip install coverage
+  - coverage run --branch `which py.test`
+  - coverage html
+  - docs: http://bit.ly/coveragepy
+
+* tox
+  - easily run your tests across a matrix of environments
+    - different Python versions
+    - different dependency versions
+    - different configurations
+  - toy example: test on Python 2.7 and 3.3, with Django 1.5 and 1.6 - four envs
+  - complex example: many Python versions, Django versions, and databases
+  - docs: http://bit.ly/py-tox
 
 * WebTest
   - server-side testing of web applications
@@ -57,14 +75,6 @@
   - docs: http://bit.ly/python-webtest
 
 * factory-boy
-* tox
-  - easily run your tests across a matrix of environments
-    - different Python versions
-    - different dependency versions
-    - different configurations
-  - toy example: test on Python 2.7 and 3.3, with Django 1.5 and 1.6 - four envs
-  - complex example: many Python versions, Django versions, and databases
-  - docs: http://bit.ly/py-tox
 
 * mock & pretend
   - sometimes your code has to interact with other code or other systems
@@ -87,11 +97,3 @@
         - try a spy instead, using mock.Mock()
         - email_server.assert_called_once_with()
   - monkeypatching - sometimes useful, but dependency injection is better
-
-* coverage
-  - which lines of my code are not executed when I run my test suite?
-    - (or, which branches of my code are not taken; not necessarily the same thing)
-  - pip install coverage
-  - coverage run --branch `which py.test`
-  - coverage html
-  - docs: http://bit.ly/coveragepy

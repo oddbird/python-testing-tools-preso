@@ -32,13 +32,14 @@ This talk
 
 * fixtures
 
-* WebTest
+* coverage
 
 * tox
 
 * mock & pretend
 
-* coverage
+* WebTest
+
 
 ----
 
@@ -51,7 +52,7 @@ How
 
 * Example(s)
 
-* Just a taste!
+* Further exploration
 
 * Link to docs
 
@@ -81,7 +82,7 @@ Me
 
 ----
 
-:data-emphasize-lines-step: 9,10
+:data-emphasize-lines-step: 1,3,5,7,9,10
 
 py.test
 =======
@@ -161,7 +162,7 @@ test_grades.py
 :data-pytest-highlight: 1
 :data-emphasize-lines-step: 6,12,13,14,15
 
-helpful failures
+Helpful failures
 ----------------
 
 .. code::
@@ -472,10 +473,11 @@ Parametrized tests
 :data-emphasize-lines-step: 2,3,4,8,9
 :data-reveal: 1
 
-the naive approach
-------------------
+Naive approach
+--------------
 
 .. code:: python
+   :number-lines:
 
    def test_sum():
        tests = [
@@ -497,11 +499,59 @@ the naive approach
 
 ----
 
+:data-emphasize-lines-step: 3,4,5,6,7,8,9,10
+
+test_sum.py
+-----------
+
 .. code:: python
+   :number-lines:
 
    import pytest
 
-   @pytest.mark.parametrize()
+   @pytest.mark.parametrize(
+       'inputs,output',
+       [   ([], 0),
+           ([1, 2], 3),
+           ([0, 2], 2),
+           ([-4, 3, 2], 2)  ])
+   def test_sum(inputs, output):
+       assert sum(inputs) == output
+
+----
+
+:data-emphasize-lines-step: 1,4,6,10,20,21
+:data-pytest-highlight: 1
+
+.. code::
+   :number-lines:
+
+   $ py.test test_sum.py
+   =============== test session starts =======================
+   platform linux -- Python 3.3.2 -- py-1.4.20 -- pytest-2.5.2
+   collected 4 items
+
+   test_sum.py ...F
+
+   ================ FAILURES =================================
+   ________________ test_sum[inputs3-2] ______________________
+   inputs = [-4, 3, 2], output = 2
+
+       @pytest.mark.parametrize(
+           'inputs,output',
+           [   ([], 0),
+               ([1, 2], 3),
+               ([0, 2], 2),
+               ([-4, 3, 2], 2)  ])
+       def test_sum(inputs, output):
+   >       assert sum(inputs) == output
+   E       assert 1 == 2
+   E        +  where 1 = sum([-4, 3, 2])
+
+   test_sum.py:13: AssertionError
+   ================ 1 failed, 3 passed in 0.02 seconds =======
+
+
 
 ----
 
@@ -576,7 +626,7 @@ Fixture lifecycle scopes
 ------------------------
 
 * Default scope is "function": new fixture will be setup and torn down for
-  each test.
+  each test that requests it.
 
 * Other scopes: "class", "module", "session".
 
@@ -667,6 +717,128 @@ Paired fixtures
 
 ----
 
+:data-emphasize-lines-step: 1,2,3,4,5,10,11
+
+Parametrized fixtures
+---------------------
+
+.. code:: python
+   :number-lines:
+
+   @pytest.yield_fixture(
+       params=['sqlite', 'mysql', 'postgres'])
+   def db_conn(request):
+       if request.param == 'sqlite':
+           conn = create_sqlite_test_database()
+       elif request.param == 'mysql':
+           conn = create_mysql_test_database()
+       elif request.param == 'postgres':
+           conn = create_postgres_test_database()
+       yield conn
+       destroy_test_database(conn)
+
+.. note::
+
+   Say we have some tests using a database, and we want to automatically run
+   all of those tests against all of our supported databases.
+
+   We can take a db fixture like we saw above, and parametrize it.
+
+   Now any test that uses this fixture will run three times, once with each
+   value for ``request.param``.
+
+   Tests that don't use the ``db`` fixture unaffected.
+
+----
+
+:data-reveal: 1
+
+py.test plugins
+---------------
+
+* `pytest-xdist`_
+
+* `pytest-cov`_
+
+* `pytest-bdd`_ / `pytest-konira`_
+
+* `pytest-flakes`_
+
+* `pytest-django`_
+
+* `pytest-twisted`_
+
+* `pytest-capturelog`_
+
+* ...
+
+.. _pytest-xdist: http://pytest.org/latest/xdist.html
+.. _pytest-cov: https://pypi.python.org/pypi/pytest-cov
+.. _pytest-bdd: https://pypi.python.org/pypi/pytest-bdd
+.. _pytest-konira: https://pypi.python.org/pypi/pytest-konira
+.. _pytest-flakes: https://pypi.python.org/pypi/pytest-flakes
+.. _pytest-django: https://pypi.python.org/pypi/pytest-django
+.. _pytest-twisted: https://pypi.python.org/pypi/pytest-twisted
+.. _pytest-capturelog: https://pypi.python.org/pypi/pytest-capturelog
+
+----
+
+:data-reveal: 1
+
+py.test review
+--------------
+
+* write tests as **simple functions** with **asserts**.
+
+* run the **specific tests** you want.
+
+* get **helpful debugging information** when tests fail.
+
+* mark tests to be **skipped** or as **expected-fails**.
+
+* modular **fixtures** for resources required by tests.
+
+* **parametrize** individual tests and fixtures.
+
+* many, many **plugins**.
+
+----
+
+:data-reveal: 1
+:data-emphasize-lines-step: 1,3,5,8
+
+Measuring test coverage
+-----------------------
+
+How much of my production code is exercised by my test suite?
+
+.. code::
+   :number-lines:
+
+   $ pip install coverage
+
+   $ coverage run --branch `which py.test`
+
+   $ coverage report --include=grades.py
+   Name     Stmts   Miss Branch BrMiss  Cover
+   ------------------------------------------
+   grades       6      3      4      3    40%
+
+----
+
+.. code::
+
+   $ coverage html
+
+.. image:: images/coverage.png
+   :width: 770px
+
+.. note::
+
+   100% coverage not guarantee of adequate tests, but roughly minimum bound.
+
+----
+
 :id: questions
 
 Questions?
@@ -674,9 +846,11 @@ Questions?
 
 * `oddbird.net/python-testing-tools-preso`_
 * `pytest.org`_
+* `nedbatchelder.com/code/coverage/`_
 
 .. _oddbird.net/python-testing-tools-preso: http://oddbird.net/python-testing-tools-preso
 .. _pytest.org: http://pytest.org
+.. _nedbatchelder.com/code/coverage/: http://nedbatchelder.com/code/coverage/
 
 |hcard|
 
