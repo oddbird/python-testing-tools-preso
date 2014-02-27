@@ -228,7 +228,57 @@ value for <tt>request.param</tt>.</p><p>Tests that don't use the <tt>db</tt> fix
 <span class="ln">5 </span>$ coverage report --include=grades.py
 <span class="ln">6 </span>Name     Stmts   Miss Branch BrMiss  Cover
 <span class="ln">7 </span>------------------------------------------
-<span class="ln">8 </span>grades       6      3      4      3    40%</pre></div><div class="step" step="29" data-x="46400" data-y="0"><pre class="highlight code">$ coverage html</pre><img src="images/coverage.png" alt="" width="770px" height=""></img><div class="notes"><p>100% coverage not guarantee of adequate tests, but roughly minimum bound.</p></div></div><div class="step" step="30" id="questions" data-x="48000" data-y="0"><h1 id="questions">Questions?</h1><ul><li><a href="http://oddbird.net/python-testing-tools-preso">oddbird.net/python-testing-tools-preso</a></li><li><a href="http://pytest.org">pytest.org</a></li><li><a href="http://nedbatchelder.com/code/coverage/">nedbatchelder.com/code/coverage/</a></li></ul><p><div class="vcard">
+<span class="ln">8 </span>grades       6      3      4      3    40%</pre></div><div class="step" step="29" data-x="46400" data-y="0"><pre class="highlight code">$ coverage html</pre><img src="images/coverage.png" alt="" width="770px" height=""></img><div class="notes"><p>100% coverage not guarantee of adequate tests, but roughly minimum bound.</p></div></div><div class="step" step="30" data-emphasize-lines-step="1,2,4" data-x="48000" data-y="0"><h1 id="pytest-cov-plugin">pytest-cov plugin</h1><pre class="highlight code"><span class="ln">1 </span>$ pip install pytest-cov</pre><pre class="highlight code"><span class="ln">1 </span>$ pytest --cov grades --cov-report html</pre><pre class="highlight code ini"><span class="ln">1 </span><span class="k">[pytest]</span>
+<span class="ln">2 </span><span class="na">addopts</span> <span class="o">=</span> <span class="s">--cov grades --cov-report term</span></pre></div><div class="step" step="31" data-x="49600" data-y="0"><h1 id="tox">Tox</h1><p>Run your tests across a matrix of Python versions, dependencies, environments.</p></div><div class="step" step="32" data-emphasize-lines-step="2,5,6,10,11,12" data-x="51200" data-y="0"><h1 id="tox-ini">tox.ini</h1><pre class="highlight code ini"><span class="ln">1 </span><span class="k">[tox]</span>
+<span class="ln">2 </span><span class="na">envlist</span> <span class="o">=</span> <span class="s">py27,py33</span>
+<span class="ln">3 </span>
+<span class="ln">4 </span><span class="k">[testenv]</span>
+<span class="ln">5 </span><span class="na">deps</span> <span class="o">=</span> <span class="s">pytest</span>
+<span class="ln">6 </span><span class="na">commands</span> <span class="o">=</span> <span class="s">py.test</span></pre><h1 id="setup-py">setup.py</h1><pre class="highlight code python"><span class="ln">1 </span><span class="kn">from</span> <span class="nn">distutils.core</span> <span class="kn">import</span> <span class="n">setup</span>
+<span class="ln">2 </span>
+<span class="ln">3 </span><span class="n">setup</span><span class="p">(</span>
+<span class="ln">4 </span>    <span class="n">name</span><span class="o">=</span><span class="s">'testproj'</span><span class="p">,</span>
+<span class="ln">5 </span>    <span class="n">version</span><span class="o">=</span><span class="s">'0.1'</span><span class="p">,</span>
+<span class="ln">6 </span>    <span class="n">py_modules</span><span class="o">=</span><span class="p">[</span><span class="s">'grades'</span><span class="p">],</span>
+<span class="ln">7 </span>    <span class="p">)</span></pre></div><div class="step" step="33" data-emphasize-lines-step="1,2,3,4,5,6,11,15,18,19,20" data-pytest-highlight="1" data-x="52800" data-y="0"><pre class="highlight code"><span class="ln"> 1 </span>$ tox
+<span class="ln"> 2 </span>GLOB sdist-make: /.../code/setup.py
+<span class="ln"> 3 </span>py27 create: /.../code/.tox/py27
+<span class="ln"> 4 </span>py27 installdeps: pytest
+<span class="ln"> 5 </span>py27 inst: /.../code/.tox/dist/testproj-0.1.zip
+<span class="ln"> 6 </span>py27 runtests: commands[0] | py.test
+<span class="ln"> 7 </span>=================== test session starts ====================
+<span class="ln"> 8 </span>platform linux3 -- Python 2.6.8 -- py-1.4.20 -- pytest-2.5.2
+<span class="ln"> 9 </span>collected 1 items
+<span class="ln">10 </span>
+<span class="ln">11 </span>test_grades.py .
+<span class="ln">12 </span>
+<span class="ln">13 </span>=================== 1 passed in 0.01 seconds ===============
+<span class="ln">14 </span>
+<span class="ln">15 </span>... &lt;same for py33&gt;...
+<span class="ln">16 </span>
+<span class="ln">17 </span>___________________ summary ________________________________
+<span class="ln">18 </span>  py27: commands succeeded
+<span class="ln">19 </span>  py33: commands succeeded
+<span class="ln">20 </span>  congratulations :)</pre></div><div class="step" step="34" data-x="54400" data-y="0"><pre class="highlight code ini"><span class="k">[tox]</span>
+<span class="na">envlist</span> <span class="o">=</span><span class="s">
+    py26-1.4, py26-1.5, py26-1.6,
+    py27-1.4, py27-1.5, py27-1.6, py27-trunk,
+    py32-1.5, py32-1.6, py32-trunk,
+    py33-1.5, py33-1.6, py33-trunk</span>
+
+<span class="k">[testenv]</span>
+<span class="na">deps</span> <span class="o">=</span><span class="s">
+    South == 0.8.1
+    coverage == 3.6</span>
+<span class="na">commands</span> <span class="o">=</span> <span class="s">coverage run -a setup.py test</span>
+
+<span class="k">[testenv:py26-1.4]</span>
+<span class="na">basepython</span> <span class="o">=</span> <span class="s">python2.6</span>
+<span class="na">deps</span> <span class="o">=</span><span class="s">
+    Django == 1.4.10
+    {[base]deps}</span>
+
+<span class="err">...</span> <span class="err">&lt;same</span> <span class="err">for</span> <span class="err">each</span> <span class="err">env&gt;</span> <span class="err">...</span></pre></div><div class="step" step="35" id="questions" data-x="56000" data-y="0"><h1 id="questions">Questions?</h1><ul><li><a href="http://oddbird.net/python-testing-tools-preso">oddbird.net/python-testing-tools-preso</a></li><li><a href="http://pytest.org">pytest.org</a></li><li><a href="http://nedbatchelder.com/code/coverage/">nedbatchelder.com/code/coverage/</a></li><li><a href="http://tox.readthedocs.org/en/latest/">tox.readthedocs.org/en/latest/</a></li></ul><p><div class="vcard">
 <a href="http://www.oddbird.net">
   <img src="images/logo.svg" alt="OddBird" class="logo" />
 </a>

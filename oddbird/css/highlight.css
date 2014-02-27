@@ -366,5 +366,13 @@
 }
 
 .error {
-  color: red;
+  color: #dc322f;
+}
+
+.success {
+  color: #859900;
+}
+
+.elision {
+  color: #268bd2;
 }

@@ -113,5 +113,13 @@ $green    : #859900;
   }
 
 .error {
-  color: red;
+  color: $red;
+}
+
+.success {
+  color: $green;
+}
+
+.elision {
+  color: $blue;
 }

@@ -27,6 +27,10 @@ $(function () {
           var text = textNode.nodeValue;
           if ((text.indexOf('E') === 0) || (text.indexOf(' failed') > 0)) {
             $(textNode).wrap('<span class="error"></span>');
+          } else if (text.indexOf('same for') > 0) {
+            $(textNode).wrap('<span class="elision"></span>');
+          } else if (text.indexOf('succeeded') > 0 || text.indexOf(':)') > 0) {
+            $(textNode).wrap('<span class="success"></span>');
           }
         }
       });

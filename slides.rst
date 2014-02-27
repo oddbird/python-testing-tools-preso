@@ -839,6 +839,122 @@ How much of my production code is exercised by my test suite?
 
 ----
 
+:data-emphasize-lines-step: 1,2,4
+
+pytest-cov plugin
+-----------------
+
+.. code::
+   :number-lines:
+
+   $ pip install pytest-cov
+
+.. code::
+   :number-lines:
+
+   $ pytest --cov grades --cov-report html
+
+.. code:: ini
+   :number-lines:
+
+   [pytest]
+   addopts = --cov grades --cov-report term
+
+----
+
+Tox
+===
+
+Run your tests across a matrix of Python versions, dependencies, environments.
+
+----
+
+:data-emphasize-lines-step: 2,5,6,10,11,12
+
+tox.ini
+-------
+
+.. code:: ini
+   :number-lines:
+
+   [tox]
+   envlist = py27,py33
+
+   [testenv]
+   deps = pytest
+   commands = py.test
+
+setup.py
+--------
+
+.. code:: python
+   :number-lines:
+
+   from distutils.core import setup
+
+   setup(
+       name='testproj',
+       version='0.1',
+       py_modules=['grades'],
+       )
+
+----
+
+:data-emphasize-lines-step: 1,2,3,4,5,6,11,15,18,19,20
+:data-pytest-highlight: 1
+
+.. code::
+   :number-lines:
+
+   $ tox
+   GLOB sdist-make: /.../code/setup.py
+   py27 create: /.../code/.tox/py27
+   py27 installdeps: pytest
+   py27 inst: /.../code/.tox/dist/testproj-0.1.zip
+   py27 runtests: commands[0] | py.test
+   =================== test session starts ====================
+   platform linux3 -- Python 2.6.8 -- py-1.4.20 -- pytest-2.5.2
+   collected 1 items
+
+   test_grades.py .
+
+   =================== 1 passed in 0.01 seconds ===============
+
+   ... <same for py33>...
+
+   ___________________ summary ________________________________
+     py27: commands succeeded
+     py33: commands succeeded
+     congratulations :)
+
+
+----
+
+.. code:: ini
+
+   [tox]
+   envlist =
+       py26-1.4, py26-1.5, py26-1.6,
+       py27-1.4, py27-1.5, py27-1.6, py27-trunk,
+       py32-1.5, py32-1.6, py32-trunk,
+       py33-1.5, py33-1.6, py33-trunk
+
+   [testenv]
+   deps =
+       South == 0.8.1
+       coverage == 3.6
+   commands = coverage run -a setup.py test
+
+   [testenv:py26-1.4]
+   basepython = python2.6
+   deps =
+       Django == 1.4.10
+       {[base]deps}
+
+   ... <same for each env> ...
+
+----
+
 :id: questions
 
 Questions?
@@ -847,10 +963,12 @@ Questions?
 * `oddbird.net/python-testing-tools-preso`_
 * `pytest.org`_
 * `nedbatchelder.com/code/coverage/`_
+* `tox.readthedocs.org/en/latest/`_
 
 .. _oddbird.net/python-testing-tools-preso: http://oddbird.net/python-testing-tools-preso
 .. _pytest.org: http://pytest.org
 .. _nedbatchelder.com/code/coverage/: http://nedbatchelder.com/code/coverage/
+.. _tox.readthedocs.org/en/latest/: http://tox.readthedocs.org/en/latest/
 
 |hcard|
 
