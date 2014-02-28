@@ -976,13 +976,13 @@ Questions?
 ==========
 
 * `oddbird.net/python-testing-tools-preso`_
-* `oddbird.net/start-testing-preso`_
+* `pyvideo.org/video/1674/getting-started-with-automated-testing`_
 * `pytest.org`_
 * `nedbatchelder.com/code/coverage/`_
 * `tox.readthedocs.org/en/latest/`_
 
 .. _oddbird.net/python-testing-tools-preso: http://oddbird.net/python-testing-tools-preso
-.. _oddbird.net/start-testing-preso: http://oddbird.net/start-testing-preso
+.. _pyvideo.org/video/1674/getting-started-with-automated-testing: http://pyvideo.org/video/1674/getting-started-with-automated-testing
 .. _pytest.org: http://pytest.org
 .. _nedbatchelder.com/code/coverage/: http://nedbatchelder.com/code/coverage/
 .. _tox.readthedocs.org/en/latest/: http://tox.readthedocs.org/en/latest/
