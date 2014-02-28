@@ -36,10 +36,6 @@ This talk
 
 * tox
 
-* mock & pretend
-
-* WebTest
-
 
 ----
 
@@ -80,6 +76,8 @@ Me
 
 * OSS: pip, virtualenv, Django
 
+* OddBird: custom web tools for humans
+
 ----
 
 :data-emphasize-lines-step: 1,3,5,7,9,10
@@ -93,12 +91,11 @@ grades.py
 .. code:: python
    :number-lines:
 
-   def get_level(min_grade, max_grade):
-       if max_grade <= 6:
+   def get_level(grade):
+       if grade <= 6:
            return 'elementary'
-       if min_grade > 6:
+       else:
            return 'secondary'
-       return None
 
 .. invisible-code-block: python
 
@@ -115,7 +112,7 @@ test_grades.py
    import grades
 
    def test_get_level():
-       assert grades.get_level(2, 5) == 'elementary'
+       assert grades.get_level(2) == 'elementary'
 
 
 .. note::
@@ -160,7 +157,7 @@ test_grades.py
 ----
 
 :data-pytest-highlight: 1
-:data-emphasize-lines-step: 6,12,13,14,15
+:data-emphasize-lines-step: 6,12,13,14,15,18
 
 Helpful failures
 ----------------
@@ -179,7 +176,7 @@ Helpful failures
    ________________ test_get_level ____________________________
 
        def test_get_level():
-   >       assert grades.get_level(2, 5) == 'secondary'
+   >       assert grades.get_level(2) == 'secondary'
    E       assert 'elementary' == 'secondary'
    E         - elementary
    E         + secondary
@@ -571,7 +568,7 @@ py.test fixtures
 
 ----
 
-:data-emphasize-lines-step: 5,7,8,9,12
+:data-emphasize-lines-step: 5,7,8,9,12,14
 
 Example: tempdir
 ----------------
@@ -646,7 +643,7 @@ Session-scope fixture
    import pytest
 
    @pytest.yield_fixture(scope='session')
-   def db():
+   def db_conn():
        create_test_database()
        conn = get_test_database_connection()
        yield conn
@@ -655,7 +652,7 @@ Session-scope fixture
 .. code:: python
    :number-lines:
 
-   def test_query(db):
+   def test_query(db_conn):
        pass # ...
 
 .. note::
@@ -822,7 +819,7 @@ How much of my production code is exercised by my test suite?
    $ coverage report --include=grades.py
    Name     Stmts   Miss Branch BrMiss  Cover
    ------------------------------------------
-   grades       6      3      4      3    40%
+   grades       4      1      2      1    67%
 
 ----
 
@@ -955,6 +952,8 @@ setup.py
    ... <same for each env> ...
 
 ----
+
+:data-reveal: 1
 
 Summary
 -------

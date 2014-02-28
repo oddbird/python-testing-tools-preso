@@ -7,16 +7,15 @@
   <li><a href="http://www.oddbird.net" class="org url">oddbird.net</a></li>
   <li><a href="https://twitter.com/carljm" rel="me">@carljm</a></li>
 </ul>
-</div></p></div><div class="step" step="1" id="thistalk" data-reveal="1" data-x="1600" data-y="0"><h1 id="this-talk">This talk</h1><ul><li>py.test</li><li>test marking &amp; skipping</li><li>parametrized tests</li><li>fixtures</li><li>coverage</li><li>tox</li><li>mock &amp; pretend</li><li>WebTest</li></ul></div><div class="step" step="2" data-reveal="1" data-x="3200" data-y="0"><h1 id="how">How</h1><ul><li>Introduce a feature</li><li>Example(s)</li><li>Further exploration</li><li>Link to docs</li><li>Python 3</li></ul><div class="notes"><p>Docs links on final slide. No stress; doc links will be live in online
-slides.</p><p>All code is Py3, but will note Py2 differences.</p></div></div><div class="step" step="3" data-reveal="1" data-x="4800" data-y="0"><h1 id="me">Me</h1><ul><li>Writing Python since 2002.</li><li>Professionally since 2007.</li><li>Mostly web development.</li><li>OSS: pip, virtualenv, Django</li></ul></div><div class="step" step="4" data-emphasize-lines-step="1,3,5,7,9,10" data-x="6400" data-y="0"><h1 id="py-test">py.test</h1><h2 id="grades-py">grades.py</h2><pre class="highlight code python"><span class="ln">1 </span><span class="k">def</span> <span class="nf">get_level</span><span class="p">(</span><span class="n">min_grade</span><span class="p">,</span> <span class="n">max_grade</span><span class="p">):</span>
-<span class="ln">2 </span>    <span class="k">if</span> <span class="n">max_grade</span> <span class="o">&lt;=</span> <span class="mi">6</span><span class="p">:</span>
+</div></p></div><div class="step" step="1" id="thistalk" data-reveal="1" data-x="1600" data-y="0"><h1 id="this-talk">This talk</h1><ul><li>py.test</li><li>test marking &amp; skipping</li><li>parametrized tests</li><li>fixtures</li><li>coverage</li><li>tox</li></ul></div><div class="step" step="2" data-reveal="1" data-x="3200" data-y="0"><h1 id="how">How</h1><ul><li>Introduce a feature</li><li>Example(s)</li><li>Further exploration</li><li>Link to docs</li><li>Python 3</li></ul><div class="notes"><p>Docs links on final slide. No stress; doc links will be live in online
+slides.</p><p>All code is Py3, but will note Py2 differences.</p></div></div><div class="step" step="3" data-reveal="1" data-x="4800" data-y="0"><h1 id="me">Me</h1><ul><li>Writing Python since 2002.</li><li>Professionally since 2007.</li><li>Mostly web development.</li><li>OSS: pip, virtualenv, Django</li><li>OddBird: custom web tools for humans</li></ul></div><div class="step" step="4" data-emphasize-lines-step="1,3,5,7,9,10" data-x="6400" data-y="0"><h1 id="py-test">py.test</h1><h2 id="grades-py">grades.py</h2><pre class="highlight code python"><span class="ln">1 </span><span class="k">def</span> <span class="nf">get_level</span><span class="p">(</span><span class="n">grade</span><span class="p">):</span>
+<span class="ln">2 </span>    <span class="k">if</span> <span class="n">grade</span> <span class="o">&lt;=</span> <span class="mi">6</span><span class="p">:</span>
 <span class="ln">3 </span>        <span class="k">return</span> <span class="s">'elementary'</span>
-<span class="ln">4 </span>    <span class="k">if</span> <span class="n">min_grade</span> <span class="o">&gt;</span> <span class="mi">6</span><span class="p">:</span>
-<span class="ln">5 </span>        <span class="k">return</span> <span class="s">'secondary'</span>
-<span class="ln">6 </span>    <span class="k">return</span> <span class="bp">None</span></pre><h2 id="test-grades-py">test_grades.py</h2><pre class="highlight code python"><span class="ln">1 </span><span class="kn">import</span> <span class="nn">grades</span>
+<span class="ln">4 </span>    <span class="k">else</span><span class="p">:</span>
+<span class="ln">5 </span>        <span class="k">return</span> <span class="s">'secondary'</span></pre><h2 id="test-grades-py">test_grades.py</h2><pre class="highlight code python"><span class="ln">1 </span><span class="kn">import</span> <span class="nn">grades</span>
 <span class="ln">2 </span>
 <span class="ln">3 </span><span class="k">def</span> <span class="nf">test_get_level</span><span class="p">():</span>
-<span class="ln">4 </span>    <span class="k">assert</span> <span class="n">grades</span><span class="o">.</span><span class="n">get_level</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span> <span class="o">==</span> <span class="s">'elementary'</span></pre><div class="notes"><p>py.test will find and run tests in any file whose name begins with
+<span class="ln">4 </span>    <span class="k">assert</span> <span class="n">grades</span><span class="o">.</span><span class="n">get_level</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="s">'elementary'</span></pre><div class="notes"><p>py.test will find and run tests in any file whose name begins with
 "test_". Test functions also need to have names beginning with "test".</p><p>Matching up "grades.py" with "test_grades.py" is not necessary, though often
 helpful to keep tests organized.</p><p>(These naming conventions are customizable.)</p><p>Low-boilerplate tests: plain functions, plain asserts.</p></div></div><div class="step" step="5" data-emphasize-lines-step="1,2,4,5,7,9" data-x="8000" data-y="0"><pre class="highlight code"><span class="ln">1 </span>$ pip install pytest</pre><pre class="highlight code"><span class="ln">1 </span>$ py.test
 <span class="ln">2 </span>============== test session starts ========================
@@ -27,7 +26,7 @@ helpful to keep tests organized.</p><p>(These naming conventions are customizabl
 <span class="ln">7 </span>
 <span class="ln">8 </span>============== 1 passed in 0.01 seconds ===================</pre><div class="notes"><p>To run the tests, just "pip install pytest" and run "py.test" - it will
 automatically find and run your tests. Here it runs our one test, which
-passes!</p></div></div><div class="step" step="6" data-pytest-highlight="1" data-emphasize-lines-step="6,12,13,14,15" data-x="9600" data-y="0"><h1 id="helpful-failures">Helpful failures</h1><pre class="highlight code"><span class="ln"> 1 </span>$ py.test
+passes!</p></div></div><div class="step" step="6" data-pytest-highlight="1" data-emphasize-lines-step="6,12,13,14,15,18" data-x="9600" data-y="0"><h1 id="helpful-failures">Helpful failures</h1><pre class="highlight code"><span class="ln"> 1 </span>$ py.test
 <span class="ln"> 2 </span>================ test session starts ======================
 <span class="ln"> 3 </span>platform linux -- Python 3.3.2 -- py-1.4.20 -- pytest-2.5.2
 <span class="ln"> 4 </span>collected 1 items
@@ -38,7 +37,7 @@ passes!</p></div></div><div class="step" step="6" data-pytest-highlight="1" data
 <span class="ln"> 9 </span>________________ test_get_level ____________________________
 <span class="ln">10 </span>
 <span class="ln">11 </span>    def test_get_level():
-<span class="ln">12 </span>&gt;       assert grades.get_level(2, 5) == 'secondary'
+<span class="ln">12 </span>&gt;       assert grades.get_level(2) == 'secondary'
 <span class="ln">13 </span>E       assert 'elementary' == 'secondary'
 <span class="ln">14 </span>E         - elementary
 <span class="ln">15 </span>E         + secondary
@@ -158,7 +157,7 @@ configurations/conditions.</li></ul></div><div class="step" step="17" data-empha
 <span class="ln">24 </span>================ 1 failed, 3 passed in 0.02 seconds =======</pre></div><div class="step" step="20" data-reveal="1" data-x="32000" data-y="0"><h1 id="py-test-fixtures">py.test fixtures</h1><ul><li>Each test should run in a predictable, repeatable, baseline environment.</li><li>Some tests need resources (a database, the filesystem, an initialized code
 object) that may require some <strong>setup</strong> and <strong>teardown</strong> in order to provide
 a predictable environment.</li><li>py.test fixtures are a modular system for defining such resources and
-allowing tests to request access to them.</li></ul></div><div class="step" step="21" data-emphasize-lines-step="5,7,8,9,12" data-x="33600" data-y="0"><h1 id="example-tempdir">Example: tempdir</h1><pre class="highlight code python"><span class="ln"> 1 </span><span class="kn">import</span> <span class="nn">shutil</span>
+allowing tests to request access to them.</li></ul></div><div class="step" step="21" data-emphasize-lines-step="5,7,8,9,12,14" data-x="33600" data-y="0"><h1 id="example-tempdir">Example: tempdir</h1><pre class="highlight code python"><span class="ln"> 1 </span><span class="kn">import</span> <span class="nn">shutil</span>
 <span class="ln"> 2 </span><span class="kn">from</span> <span class="nn">tempfile</span> <span class="kn">import</span> <span class="n">mkdtemp</span>
 <span class="ln"> 3 </span><span class="kn">import</span> <span class="nn">pytest</span>
 <span class="ln"> 4 </span>
@@ -182,11 +181,11 @@ and cleans up older ones only.)</p></div></div><div class="step" step="22" data-
 each test that requests it.</li><li>Other scopes: "class", "module", "session".</li><li>Setup new fixture once per test class, test module, or test session.</li></ul></div><div class="step" step="23" data-emphasize-lines-step="3,5,6,7,8,9" data-x="36800" data-y="0"><h1 id="session-scope-fixture">Session-scope fixture</h1><pre class="highlight code python"><span class="ln">1 </span><span class="kn">import</span> <span class="nn">pytest</span>
 <span class="ln">2 </span>
 <span class="ln">3 </span><span class="nd">@pytest.yield_fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s">'session'</span><span class="p">)</span>
-<span class="ln">4 </span><span class="k">def</span> <span class="nf">db</span><span class="p">():</span>
+<span class="ln">4 </span><span class="k">def</span> <span class="nf">db_conn</span><span class="p">():</span>
 <span class="ln">5 </span>    <span class="n">create_test_database</span><span class="p">()</span>
 <span class="ln">6 </span>    <span class="n">conn</span> <span class="o">=</span> <span class="n">get_test_database_connection</span><span class="p">()</span>
 <span class="ln">7 </span>    <span class="k">yield</span> <span class="n">conn</span>
-<span class="ln">8 </span>    <span class="n">destroy_test_database</span><span class="p">()</span></pre><pre class="highlight code python"><span class="ln">1 </span><span class="k">def</span> <span class="nf">test_query</span><span class="p">(</span><span class="n">db</span><span class="p">):</span>
+<span class="ln">8 </span>    <span class="n">destroy_test_database</span><span class="p">()</span></pre><pre class="highlight code python"><span class="ln">1 </span><span class="k">def</span> <span class="nf">test_query</span><span class="p">(</span><span class="n">db_conn</span><span class="p">):</span>
 <span class="ln">2 </span>    <span class="k">pass</span> <span class="c"># ...</span></pre><div class="notes"><p>I find few good use cases for class or module-scope fixtures; I'll just give
 an example of a session-scope fixture.</p><p>Creating and destroying a database is too slow to do every test; just want
 to create the test db once at start of test run and destroy it at the end. A
@@ -228,7 +227,7 @@ value for <tt>request.param</tt>.</p><p>Tests that don't use the <tt>db</tt> fix
 <span class="ln">5 </span>$ coverage report --include=grades.py
 <span class="ln">6 </span>Name     Stmts   Miss Branch BrMiss  Cover
 <span class="ln">7 </span>------------------------------------------
-<span class="ln">8 </span>grades       6      3      4      3    40%</pre></div><div class="step" step="29" data-x="46400" data-y="0"><pre class="highlight code">$ coverage html</pre><img src="images/coverage.png" alt="" width="770px" height=""></img><div class="notes"><p>100% coverage not guarantee of adequate tests, but roughly minimum bound.</p></div></div><div class="step" step="30" data-emphasize-lines-step="1,2,4" data-x="48000" data-y="0"><h1 id="pytest-cov-plugin">pytest-cov plugin</h1><pre class="highlight code"><span class="ln">1 </span>$ pip install pytest-cov</pre><pre class="highlight code"><span class="ln">1 </span>$ pytest --cov grades --cov-report html</pre><pre class="highlight code ini"><span class="ln">1 </span><span class="k">[pytest]</span>
+<span class="ln">8 </span>grades       4      1      2      1    67%</pre></div><div class="step" step="29" data-x="46400" data-y="0"><pre class="highlight code">$ coverage html</pre><img src="images/coverage.png" alt="" width="770px" height=""></img><div class="notes"><p>100% coverage not guarantee of adequate tests, but roughly minimum bound.</p></div></div><div class="step" step="30" data-emphasize-lines-step="1,2,4" data-x="48000" data-y="0"><h1 id="pytest-cov-plugin">pytest-cov plugin</h1><pre class="highlight code"><span class="ln">1 </span>$ pip install pytest-cov</pre><pre class="highlight code"><span class="ln">1 </span>$ pytest --cov grades --cov-report html</pre><pre class="highlight code ini"><span class="ln">1 </span><span class="k">[pytest]</span>
 <span class="ln">2 </span><span class="na">addopts</span> <span class="o">=</span> <span class="s">--cov grades --cov-report term</span></pre></div><div class="step" step="31" data-x="49600" data-y="0"><h1 id="tox">Tox</h1><p>Run your tests across a matrix of Python versions, dependencies, environments.</p></div><div class="step" step="32" data-emphasize-lines-step="2,5,6,10,11,12" data-x="51200" data-y="0"><h1 id="tox-ini">tox.ini</h1><pre class="highlight code ini"><span class="ln">1 </span><span class="k">[tox]</span>
 <span class="ln">2 </span><span class="na">envlist</span> <span class="o">=</span> <span class="s">py27,py33</span>
 <span class="ln">3 </span>
@@ -277,7 +276,7 @@ value for <tt>request.param</tt>.</p><p>Tests that don't use the <tt>db</tt> fix
     Django == 1.4.10
     {[base]deps}</span>
 
-<span class="err">...</span> <span class="err">&lt;same</span> <span class="err">for</span> <span class="err">each</span> <span class="err">env&gt;</span> <span class="err">...</span></pre></div><div class="step" step="35" data-x="56000" data-y="0"><h1 id="summary">Summary</h1><ul><li><strong>py.test</strong>: low-boilerplate tests, helpful failures, parametrization,
+<span class="err">...</span> <span class="err">&lt;same</span> <span class="err">for</span> <span class="err">each</span> <span class="err">env&gt;</span> <span class="err">...</span></pre></div><div class="step" step="35" data-reveal="1" data-x="56000" data-y="0"><h1 id="summary">Summary</h1><ul><li><strong>py.test</strong>: low-boilerplate tests, helpful failures, parametrization,
 fixtures, plugins.</li><li><strong>coverage</strong> measures which lines of your code were exercised by your tests.</li><li><strong>tox</strong> runs your test across a matrix of Python versions, dependency
 versions, or environments.</li><li>Happy testing!</li></ul></div><div class="step" step="36" id="questions" data-x="57600" data-y="0"><h1 id="questions">Questions?</h1><ul><li><a href="http://oddbird.net/python-testing-tools-preso">oddbird.net/python-testing-tools-preso</a></li><li><a href="http://pytest.org">pytest.org</a></li><li><a href="http://nedbatchelder.com/code/coverage/">nedbatchelder.com/code/coverage/</a></li><li><a href="http://tox.readthedocs.org/en/latest/">tox.readthedocs.org/en/latest/</a></li></ul><p><div class="vcard">
 <a href="http://www.oddbird.net">
