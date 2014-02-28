@@ -976,11 +976,13 @@ Questions?
 ==========
 
 * `oddbird.net/python-testing-tools-preso`_
+* `oddbird.net/start-testing-preso`_
 * `pytest.org`_
 * `nedbatchelder.com/code/coverage/`_
 * `tox.readthedocs.org/en/latest/`_
 
 .. _oddbird.net/python-testing-tools-preso: http://oddbird.net/python-testing-tools-preso
+.. _oddbird.net/start-testing-preso: http://oddbird.net/start-testing-preso
 .. _pytest.org: http://pytest.org
 .. _nedbatchelder.com/code/coverage/: http://nedbatchelder.com/code/coverage/
 .. _tox.readthedocs.org/en/latest/: http://tox.readthedocs.org/en/latest/
