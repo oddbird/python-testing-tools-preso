@@ -277,39 +277,9 @@ value for <tt>request.param</tt>.</p><p>Tests that don't use the <tt>db</tt> fix
     Django == 1.4.10
     {[base]deps}</span>
 
-<span class="err">...</span> <span class="err">&lt;same</span> <span class="err">for</span> <span class="err">each</span> <span class="err">env&gt;</span> <span class="err">...</span></pre></div><div class="step" step="35" data-reveal="1" data-x="56000" data-y="0"><h1 id="the-big-bad-world">The big bad world</h1><ul><li>Sometimes your code has to interact with other code or systems.</li><li>Sometimes those systems are slow, complicated, and/or unreliable
-(e.g. network, database).</li><li>We don't want our tests to be slow, complicated, or unreliable.</li><li>We can isolate as much of our logic as possible, and keep the boundary layer
-thin.</li><li>But at some point we have to test that layer.</li></ul></div><div class="step" step="36" data-reveal="1" data-emphasize-lines-step="1,2,3,4,5" data-x="57600" data-y="0"><h1 id="metrics-py">metrics.py</h1><pre class="highlight code python"><span class="ln">1 </span><span class="k">def</span> <span class="nf">track_event</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-<span class="ln">2 </span>    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span> <span class="ow">or</span> <span class="p">{}</span>
-<span class="ln">3 </span>    <span class="k">if</span> <span class="n">user</span> <span class="ow">and</span> <span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">():</span>
-<span class="ln">4 </span>        <span class="n">data</span><span class="p">[</span><span class="s">'user_id'</span><span class="p">]</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">id</span>
-<span class="ln">5 </span>    <span class="n">send_to_server</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span></pre><ul><li>Two collaborators: a <tt>user</tt> object and <tt>send_to_server</tt>.</li><li>For each collaborator:</li><li>can we isolate it further?</li><li>can we let the tests exercise it?</li><li>or do we need to stub/mock it?</li></ul><div class="notes"><p>Could pull conditional out into separate function to add user info to event
-data; separate it from the actual call out to the stats server, which makes
-it more easily testable.</p><p>More conditionals means more tests, so pulling conditionals out into
-easier-to-test functions helps our tests.</p></div></div><div class="step" step="37" data-emphasize-lines-step="1,5,6,7,9,11" data-x="59200" data-y="0"><h1 id="stub">Stub</h1><pre class="highlight code"><span class="ln">1 </span>$ pip install pretend</pre><pre class="highlight code python"><span class="ln"> 1 </span><span class="kn">from</span> <span class="nn">pretend</span> <span class="kn">import</span> <span class="n">stub</span>
-<span class="ln"> 2 </span>
-<span class="ln"> 3 </span><span class="k">def</span> <span class="nf">test_track_event_with_user</span><span class="p">():</span>
-<span class="ln"> 4 </span>    <span class="n">user</span> <span class="o">=</span> <span class="n">stub</span><span class="p">(</span>
-<span class="ln"> 5 </span>        <span class="nb">id</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-<span class="ln"> 6 </span>        <span class="n">is_authenticated</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
-<span class="ln"> 7 </span>        <span class="p">)</span>
-<span class="ln"> 8 </span>    <span class="n">metrics</span><span class="o">.</span><span class="n">track_event</span><span class="p">(</span><span class="s">'test'</span><span class="p">,</span> <span class="p">{</span><span class="s">'foo'</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span> <span class="n">user</span><span class="p">)</span>
-<span class="ln"> 9 </span>
-<span class="ln">10 </span>    <span class="c"># uh...</span></pre><div class="notes"><p>Maybe our <tt>User</tt> class is simple and we can just construct a real <tt>User</tt>
-for the test. Probably we should try to build our system such that we can do
-that. But in case we can't, the "pretend" library lets us very easily build
-a "stub" user.</p></div></div><div class="step" step="38" data-emphasize-lines-step="1,8,9" data-x="60800" data-y="0"><h1 id="spy">Spy</h1><pre class="highlight code"><span class="ln"> 1 </span>from unittest import mock
-<span class="ln"> 2 </span>
-<span class="ln"> 3 </span>def test_track_event_with_user():
-<span class="ln"> 4 </span>    user = stub(
-<span class="ln"> 5 </span>        id=1,
-<span class="ln"> 6 </span>        is_authenticated=lambda: True,
-<span class="ln"> 7 </span>        )
-<span class="ln"> 8 </span>    with mock.patch('metrics.send_to_server') as mock_send:
-<span class="ln"> 9 </span>        metrics.track_event('test', {'foo': 1}, user)
-<span class="ln">10 </span>
-<span class="ln">11 </span>    mock_send.assert_called_once_with(
-<span class="ln">12 </span>        'test', {'foo': 1, 'user_id': 1})</pre><div class="notes"><p>This is the act-then-assert pattern for a spy.</p><p>Some other mocking libraries do record-and-playback or other methods.</p></div></div><div class="step" step="39" id="questions" data-x="62400" data-y="0"><h1 id="questions">Questions?</h1><ul><li><a href="http://oddbird.net/python-testing-tools-preso">oddbird.net/python-testing-tools-preso</a></li><li><a href="http://pytest.org">pytest.org</a></li><li><a href="http://nedbatchelder.com/code/coverage/">nedbatchelder.com/code/coverage/</a></li><li><a href="http://tox.readthedocs.org/en/latest/">tox.readthedocs.org/en/latest/</a></li></ul><p><div class="vcard">
+<span class="err">...</span> <span class="err">&lt;same</span> <span class="err">for</span> <span class="err">each</span> <span class="err">env&gt;</span> <span class="err">...</span></pre></div><div class="step" step="35" data-x="56000" data-y="0"><h1 id="summary">Summary</h1><ul><li><strong>py.test</strong>: low-boilerplate tests, helpful failures, parametrization,
+fixtures, plugins.</li><li><strong>coverage</strong> measures which lines of your code were exercised by your tests.</li><li><strong>tox</strong> runs your test across a matrix of Python versions, dependency
+versions, or environments.</li><li>Happy testing!</li></ul></div><div class="step" step="36" id="questions" data-x="57600" data-y="0"><h1 id="questions">Questions?</h1><ul><li><a href="http://oddbird.net/python-testing-tools-preso">oddbird.net/python-testing-tools-preso</a></li><li><a href="http://pytest.org">pytest.org</a></li><li><a href="http://nedbatchelder.com/code/coverage/">nedbatchelder.com/code/coverage/</a></li><li><a href="http://tox.readthedocs.org/en/latest/">tox.readthedocs.org/en/latest/</a></li></ul><p><div class="vcard">
 <a href="http://www.oddbird.net">
   <img src="images/logo.svg" alt="OddBird" class="logo" />
 </a>

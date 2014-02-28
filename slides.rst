@@ -956,126 +956,18 @@ setup.py
 
 ----
 
-:data-reveal: 1
+Summary
+-------
 
-The big bad world
------------------
+* **py.test**: low-boilerplate tests, helpful failures, parametrization,
+  fixtures, plugins.
 
-* Sometimes your code has to interact with other code or systems.
+* **coverage** measures which lines of your code were exercised by your tests.
 
-* Sometimes those systems are slow, complicated, and/or unreliable
-  (e.g. network, database).
+* **tox** runs your test across a matrix of Python versions, dependency
+  versions, or environments.
 
-* We don't want our tests to be slow, complicated, or unreliable.
-
-* We can isolate as much of our logic as possible, and keep the boundary layer
-  thin.
-
-* But at some point we have to test that layer.
-
-----
-
-:data-reveal: 1
-:data-emphasize-lines-step: 1,2,3,4,5
-
-metrics.py
-----------
-
-.. code:: python
-   :number-lines:
-
-   def track_event(event, data=None, user=None):
-       data = data or {}
-       if user and user.is_authenticated():
-           data['user_id'] = user.id
-       send_to_server(event, data)
-
-* Two collaborators: a ``user`` object and ``send_to_server``.
-
-* For each collaborator:
-
-* can we isolate it further?
-
-* can we let the tests exercise it?
-
-* or do we need to stub/mock it?
-
-.. note::
-
-   Could pull conditional out into separate function to add user info to event
-   data; separate it from the actual call out to the stats server, which makes
-   it more easily testable.
-
-   More conditionals means more tests, so pulling conditionals out into
-   easier-to-test functions helps our tests.
-
-.. invisible-code-block: python
-
-   import sys, types
-   sys.modules['metrics'] = types.ModuleType('metrics')
-   sys.modules['metrics'].track_event = track_event
-
-----
-
-:data-emphasize-lines-step: 1,5,6,7,9,11
-
-Stub
-----
-
-.. code::
-   :number-lines:
-
-   $ pip install pretend
-
-.. code:: python
-   :number-lines:
-
-   from pretend import stub
-
-   def test_track_event_with_user():
-       user = stub(
-           id=1,
-           is_authenticated=lambda: True,
-           )
-       metrics.track_event('test', {'foo': 1}, user)
-
-       # uh...
-
-.. note::
-
-   Maybe our ``User`` class is simple and we can just construct a real ``User``
-   for the test. Probably we should try to build our system such that we can do
-   that. But in case we can't, the "pretend" library lets us very easily build
-   a "stub" user.
-
-----
-
-:data-emphasize-lines-step: 1,8,9
-
-Spy
----
-
-.. code::
-   :number-lines:
-
-   from unittest import mock
-
-   def test_track_event_with_user():
-       user = stub(
-           id=1,
-           is_authenticated=lambda: True,
-           )
-       with mock.patch('metrics.send_to_server') as mock_send:
-           metrics.track_event('test', {'foo': 1}, user)
-
-       mock_send.assert_called_once_with(
-           'test', {'foo': 1, 'user_id': 1})
-
-.. note::
-
-   This is the act-then-assert pattern for a spy.
-
-   Some other mocking libraries do record-and-playback or other methods.
+* Happy testing!
 
 ----
 
